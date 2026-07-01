@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSI Food Solutions – Hygieneschulung 2026</title>
+<style>
+:root{--blue:#0072CE;--red:#E4002B;--dark:#0a0a1a;--card:#0f3460;--surface:#16213e;--text:#e0e0e0;--muted:#a0a0b0;--success:#00c49a;--danger:#E4002B;--border:rgba(0,114,206,0.3);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--dark);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+#lang-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#0a0a1a,#0d1b3e);padding:40px;}
+.logo{color:var(--blue);font-size:2.2rem;font-weight:700;letter-spacing:2px;margin-bottom:8px;}
+.subtitle{color:var(--muted);font-size:1rem;margin-bottom:40px;}
+#lang-screen h2{font-size:1.3rem;color:var(--text);margin-bottom:24px;}
+.lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:500px;}
+.lang-btn{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:24px 16px;text-align:center;cursor:pointer;transition:all 0.2s;color:var(--text);font-size:1rem;font-weight:600;}
+.lang-btn:hover{border-color:var(--blue);background:#1a3a6e;transform:translateY(-2px);}
+.lang-btn .flag{font-size:2rem;display:block;margin-bottom:8px;}
+#player{display:none;flex-direction:column;height:100vh;}
+#topbar{background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;}
+#topbar .brand{color:var(--blue);font-weight:700;font-size:1rem;}
+#topbar .mod-name{color:var(--muted);font-size:0.85rem;}
+#slide-counter{color:var(--muted);font-size:0.85rem;}
+#progress-wrap{background:rgba(0,0,0,0.4);height:4px;flex-shrink:0;}
+#progress-bar{height:4px;background:linear-gradient(90deg,var(--blue),var(--red));transition:width 0.4s ease;width:0%;}
+#content-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+#slide-display{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;background:linear-gradient(180deg,#0d1b3e,#0a0a1a);overflow-y:auto;}
+.slide-title{font-size:1.4rem;font-weight:700;color:var(--blue);text-align:center;margin-bottom:16px;line-height:1.3;}
+.slide-img-wrap{max-width:680px;width:100%;border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:16px;background:#000;}
+.slide-img-wrap img{width:100%;height:auto;display:block;max-height:300px;object-fit:contain;}
+.video-wrap{max-width:680px;width:100%;border-radius:12px;overflow:hidden;border:2px solid var(--blue);margin-bottom:12px;background:#000;}
+.video-wrap video{width:100%;display:block;max-height:300px;}
+#interactive-controls{display:none;flex-direction:column;align-items:center;gap:10px;max-width:680px;width:100%;}
+.answer-prompt{font-size:1rem;font-weight:600;color:var(--text);}
+.answer-btns{display:flex;gap:16px;}
+.answer-btn{padding:12px 36px;border-radius:10px;font-size:1rem;font-weight:700;border:none;cursor:pointer;transition:all 0.2s;min-width:130px;}
+.btn-r{background:var(--success);color:#fff;}
+.btn-f{background:var(--danger);color:#fff;}
+.answer-btn:hover{transform:scale(1.04);opacity:0.9;}
+.answer-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+#feedback-box{display:none;padding:14px 18px;border-radius:10px;font-weight:600;font-size:0.92rem;text-align:center;max-width:500px;width:100%;}
+#feedback-box.correct{background:rgba(0,196,154,0.2);border:1px solid var(--success);color:var(--success);}
+#feedback-box.wrong{background:rgba(228,0,43,0.15);border:1px solid var(--danger);color:#ff6b6b;}
+#narration-box{background:rgba(0,114,206,0.08);border:1px solid var(--border);border-radius:12px;padding:16px 20px;max-width:680px;width:100%;font-size:0.93rem;line-height:1.7;color:var(--text);margin-top:8px;}
+#audio-status{display:flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(0,114,206,0.1);border-radius:20px;font-size:0.8rem;color:var(--muted);}
+#audio-status .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);}
+#audio-status.playing .dot{background:var(--success);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+#bottom-bar{background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);flex-shrink:0;}
+.nav-btn{background:var(--card);border:1px solid var(--border);color:var(--text);padding:10px 22px;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;transition:all 0.2s;min-width:100px;}
+.nav-btn:hover:not(:disabled){background:var(--blue);border-color:var(--blue);color:#fff;}
+.nav-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.nav-btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;}
+#replay-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;}
+#replay-btn:hover{border-color:var(--blue);color:var(--blue);}
+#quiz-screen{display:none;flex-direction:column;align-items:center;padding:28px 20px;background:linear-gradient(135deg,#0a0a1a,#0d1b3e);min-height:100vh;overflow-y:auto;}
+#quiz-screen h2{color:var(--blue);font-size:1.4rem;margin-bottom:6px;}
+.quiz-sub{color:var(--muted);font-size:0.9rem;margin-bottom:24px;}
+.quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;max-width:660px;width:100%;margin-bottom:18px;}
+.quiz-qnum{color:var(--muted);font-size:0.82rem;margin-bottom:6px;}
+.quiz-qtext{font-size:1rem;font-weight:600;color:var(--text);margin-bottom:16px;line-height:1.5;}
+.quiz-opts{display:flex;flex-direction:column;gap:10px;}
+.quiz-opt{background:var(--card);border:2px solid var(--border);border-radius:8px;padding:11px 14px;cursor:pointer;font-size:0.9rem;color:var(--text);transition:all 0.15s;text-align:left;}
+.quiz-opt:hover{border-color:var(--blue);background:#1a3a6e;}
+.quiz-opt.selected{border-color:var(--blue);background:rgba(0,114,206,0.2);}
+.quiz-opt.correct-reveal{border-color:var(--success);background:rgba(0,196,154,0.15);color:var(--success);}
+.quiz-opt.wrong-reveal{border-color:var(--danger);background:rgba(228,0,43,0.12);color:#ff6b6b;}
+#quiz-submit{background:var(--blue);color:#fff;border:none;border-radius:10px;padding:14px 40px;font-size:1rem;font-weight:700;cursor:pointer;max-width:660px;width:100%;margin-top:6px;}
+#result-screen{display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background:linear-gradient(135deg,#0a0a1a,#0d1b3e);min-height:100vh;text-align:center;}
+.res-score{font-size:4rem;font-weight:700;color:var(--blue);margin-bottom:6px;}
+.res-label{font-size:1.1rem;color:var(--muted);margin-bottom:14px;}
+.res-verdict{font-size:1.4rem;font-weight:700;padding:12px 28px;border-radius:10px;margin-bottom:24px;}
+.res-verdict.pass{background:rgba(0,196,154,0.15);color:var(--success);border:1px solid var(--success);}
+.res-verdict.fail{background:rgba(228,0,43,0.12);color:#ff6b6b;border:1px solid var(--danger);}
+.res-retry{background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px 24px;border-radius:8px;cursor:pointer;font-size:0.9rem;margin-bottom:10px;}
+.res-cont{background:var(--blue);color:#fff;border:none;border-radius:10px;padding:14px 36px;font-size:1rem;font-weight:700;cursor:pointer;}
+#rating-screen{display:none;flex-direction:column;align-items:center;padding:40px 20px;background:linear-gradient(135deg,#0a0a1a,#0d1b3e);min-height:100vh;overflow-y:auto;}
+#rating-screen h2{color:var(--blue);font-size:1.3rem;margin-bottom:6px;}
+.rat-sub{color:var(--muted);font-size:0.9rem;margin-bottom:24px;}
+.rat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;max-width:520px;width:100%;}
+.rat-label{font-size:0.95rem;color:var(--text);margin-bottom:10px;}
+.stars{display:flex;gap:12px;justify-content:center;margin-bottom:22px;}
+.star{font-size:2.4rem;cursor:pointer;transition:transform 0.15s;color:#555;}
+.star:hover,.star.active{color:#f0a500;transform:scale(1.2);}
+.rat-comment{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-size:0.9rem;resize:vertical;min-height:80px;margin-bottom:18px;}
+.rat-submit{background:var(--blue);color:#fff;border:none;border-radius:10px;padding:14px 36px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;}
+#signoff-screen{display:none;flex-direction:column;align-items:center;padding:40px 20px;background:linear-gradient(135deg,#0a0a1a,#0d1b3e);min-height:100vh;overflow-y:auto;}
+#signoff-screen h2{color:var(--blue);font-size:1.3rem;margin-bottom:6px;}
+.so-sub{color:var(--muted);font-size:0.9rem;margin-bottom:24px;text-align:center;}
+.so-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;max-width:520px;width:100%;}
+.field-grp{margin-bottom:14px;}
+.field-lbl{font-size:0.85rem;color:var(--muted);margin-bottom:5px;display:block;}
+.field-inp{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:11px;color:var(--text);font-size:0.93rem;}
+.field-inp:focus{outline:none;border-color:var(--blue);}
+.confirm-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:18px;}
+.confirm-row input{width:18px;height:18px;margin-top:2px;accent-color:var(--blue);flex-shrink:0;}
+.confirm-row label{font-size:0.86rem;color:var(--muted);line-height:1.5;}
+.so-submit{background:var(--blue);color:#fff;border:none;border-radius:10px;padding:14px 36px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;}
+.so-submit:disabled{opacity:0.4;cursor:not-allowed;}
+#done-screen{display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background:linear-gradient(135deg,#0a0a1a,#0d1b3e);min-height:100vh;text-align:center;}
+.done-icon{font-size:4rem;margin-bottom:14px;}
+.done-title{font-size:1.6rem;font-weight:700;color:var(--success);margin-bottom:10px;}
+.done-sub{color:var(--muted);font-size:0.93rem;max-width:420px;line-height:1.6;margin-bottom:24px;}
+.done-ref{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 22px;font-size:0.85rem;color:var(--muted);max-width:420px;}
+.done-ref strong{color:var(--text);}
+@media(max-width:600px){.slide-title{font-size:1.1rem;}#narration-box{font-size:0.86rem;}.lang-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<div id="lang-screen">
+  <div class="logo">OSI FOOD SOLUTIONS</div>
+  <div class="subtitle">Günzburg · Plant 2005</div>
+  <h2>Bitte wählen Sie Ihre Sprache / Please select your language</h2>
+  <div class="lang-grid">
+    <div class="lang-btn" onclick="initTraining('DE')"><span class="flag">🇩🇪</span>Deutsch</div>
+    <div class="lang-btn" onclick="initTraining('EN')"><span class="flag">🇬🇧</span>English</div>
+    <div class="lang-btn" onclick="initTraining('TR')"><span class="flag">🇹🇷</span>Türkçe</div>
+    <div class="lang-btn" onclick="initTraining('RU')"><span class="flag">🇷🇺</span>Русский</div>
+  </div>
+</div>
+<div id="player">
+  <div id="topbar">
+    <div><div class="brand">OSI FOOD SOLUTIONS</div><div class="mod-name">Hygieneschulung 2026</div></div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div id="audio-status"><div class="dot"></div><span id="audio-lbl">Bereit</span></div>
+      <div id="slide-counter">1 / 61</div>
+    </div>
+  </div>
+  <div id="progress-wrap"><div id="progress-bar"></div></div>
+  <div id="content-area">
+    <div id="slide-display">
+      <div class="slide-title" id="slide-title">Lade...</div>
+      <div class="slide-img-wrap" id="img-wrap"><img id="slide-img" src="" alt=""></div>
+      <div class="video-wrap" id="vid-wrap" style="display:none;"><video id="slide-vid" controls playsinline></video></div>
+      <div id="interactive-controls">
+        <div class="answer-prompt" id="ans-prompt">Ist das Verhalten richtig oder falsch?</div>
+        <div class="answer-btns">
+          <button class="answer-btn btn-r" id="btn-r" onclick="submitAnswer('richtig')">✓ Richtig</button>
+          <button class="answer-btn btn-f" id="btn-f" onclick="submitAnswer('falsch')">✗ Falsch</button>
+        </div>
+        <div id="feedback-box"></div>
+      </div>
+      <div id="narration-box"><div id="narration-text"></div></div>
+    </div>
+  </div>
+  <div id="bottom-bar">
+    <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled>← Zurück</button>
+    <button id="replay-btn" onclick="replayAudio()">🔊 Wiederholen</button>
+    <button class="nav-btn primary" id="next-btn" onclick="nextSlide()">Weiter →</button>
+  </div>
+</div>
+<div id="quiz-screen"></div>
+<div id="result-screen"></div>
+<div id="rating-screen"></div>
+<div id="signoff-screen"></div>
+<div id="done-screen"></div>
+<script>
+const BASE = 'https://raw.githubusercontent.com/OSI1955/Digital_Trainings/main/';
+const FORM_URL = 'https://docs.google.com/forms/d/e/REPLACE_FORM_ID/formResponse';
+const FIELDS = {name:'entry.1',empid:'entry.2',dept:'entry.3',date:'entry.4',module:'entry.5',lang:'entry.6',score:'entry.7',rating:'entry.8',comment:'entry.9'};
+
+const UI={
+DE:{prev:'← Zurück',next:'Weiter →',finish:'Zum Quiz →',replay:'🔊 Wiederholen',r:'✓ Richtig',f:'✗ Falsch',rdy:'Bereit',spk:'Spricht...',of:'von',
+    qtitle:'Wissenstest',qsub:'Mindestens 80% richtig (8 von 10)',qsubmit:'Auswertung anzeigen',
+    rof:'von',rcorr:'Fragen richtig',passed:'✓ Bestanden',failed:'✗ Nicht bestanden',retry:'Quiz wiederholen',tocont:'Weiter →',
+    rattitle:'Schulungsbewertung',ratsub:'Ihre Rückmeldung hilft uns, die Qualität zu verbessern.',ratq:'Wie bewerten Sie diese Schulung?',ratcomment:'Anmerkungen (optional):',ratph:'Ihre Anmerkungen...',ratsubmit:'Weiter →',
+    sotitle:'Digitale Unterschrift',sosub:'Bitte füllen Sie alle Felder aus.',lname:'Vollständiger Name *',lempid:'Personalnummer *',ldept:'Abteilung / Linie *',ldate:'Datum',
+    confirm:'Ich bestätige, dass ich diese Unterweisung vollständig absolviert habe und die Inhalte verstanden habe.',sosubmit:'Abschließen und absenden →',
+    donetitle:'Schulung abgeschlossen',donesub:'Ihr Schulungsnachweis wurde gespeichert.',reflab:'Referenznummer:'},
+EN:{prev:'← Back',next:'Next →',finish:'To Quiz →',replay:'🔊 Replay',r:'✓ Correct',f:'✗ Incorrect',rdy:'Ready',spk:'Speaking...',of:'of',
+    qtitle:'Knowledge Test',qsub:'Minimum 80% correct (8 of 10)',qsubmit:'Show Results',
+    rof:'of',rcorr:'questions correct',passed:'✓ Passed',failed:'✗ Not Passed',retry:'Retry Quiz',tocont:'Continue →',
+    rattitle:'Training Rating',ratsub:'Your feedback helps us improve quality.',ratq:'How do you rate this training overall?',ratcomment:'Comments (optional):',ratph:'Your comments...',ratsubmit:'Continue →',
+    sotitle:'Digital Signature',sosub:'Please complete all fields.',lname:'Full Name *',lempid:'Employee Number *',ldept:'Department / Line *',ldate:'Date',
+    confirm:'I confirm that I have completed this training in full and understood its contents.',sosubmit:'Complete and Submit →',
+    donetitle:'Training Completed',donesub:'Your training record has been saved.',reflab:'Reference Number:'},
+TR:{prev:'← Geri',next:'İleri →',finish:'Teste Git →',replay:'🔊 Tekrarla',r:'✓ Doğru',f:'✗ Yanlış',rdy:'Hazır',spk:'Konuşuyor...',of:'/',
+    qtitle:'Bilgi Testi',qsub:'En az %80 doğru (10 üzerinden 8)',qsubmit:'Sonuçları Göster',
+    rof:'/',rcorr:'soru doğru',passed:'✓ Geçti',failed:'✗ Geçemedi',retry:'Testi Tekrarla',tocont:'Devam →',
+    rattitle:'Eğitim Değerlendirmesi',ratsub:'Geri bildiriminiz kaliteyi artırmamıza yardımcı olur.',ratq:'Bu eğitimi nasıl değerlendiriyorsunuz?',ratcomment:'Yorumlar (isteğe bağlı):',ratph:'Yorumlarınız...',ratsubmit:'Devam →',
+    sotitle:'Dijital İmza',sosub:'Lütfen tüm alanları doldurun.',lname:'Tam Ad *',lempid:'Personel Numarası *',ldept:'Bölüm / Hat *',ldate:'Tarih',
+    confirm:'Bu eğitimi eksiksiz tamamladığımı ve içeriğini anladığımı onaylıyorum.',sosubmit:'Tamamla ve Gönder →',
+    donetitle:'Eğitim Tamamlandı',donesub:'Eğitim kaydınız kaydedildi.',reflab:'Referans Numarası:'},
+RU:{prev:'← Назад',next:'Далее →',finish:'К тесту →',replay:'🔊 Повторить',r:'✓ Правильно',f:'✗ Неправильно',rdy:'Готово',spk:'Озвучивание...',of:'из',
+    qtitle:'Тест знаний',qsub:'Минимум 80% правильных (8 из 10)',qsubmit:'Показать результаты',
+    rof:'из',rcorr:'вопросов правильно',passed:'✓ Пройдено',failed:'✗ Не пройдено',retry:'Повторить тест',tocont:'Продолжить →',
+    rattitle:'Оценка обучения',ratsub:'Ваши отзывы помогают нам улучшить качество.',ratq:'Как вы оцениваете это обучение?',ratcomment:'Комментарии (необязательно):',ratph:'Ваши комментарии...',ratsubmit:'Продолжить →',
+    sotitle:'Цифровая подпись',sosub:'Пожалуйста, заполните все поля.',lname:'Полное имя *',lempid:'Табельный номер *',ldept:'Отдел / Линия *',ldate:'Дата',
+    confirm:'Я подтверждаю, что прошёл(а) это обучение полностью и понял(а) его содержание.',sosubmit:'Завершить и отправить →',
+    donetitle:'Обучение завершено',donesub:'Ваша запись об обучении сохранена.',reflab:'Номер ссылки:'}
+};
+
+const SLIDES=[
+{id:1,img:'hygiene_images/image1.png',title:{DE:'Hygieneschulung 2026',EN:'Hygiene Training 2026',TR:'Hijyen Eğitimi 2026',RU:'Обучение гигиене 2026'},narr:{DE:'Willkommen zur Hygieneschulung 2026 bei OSI Food Solutions. Diese Schulung behandelt die gesetzlichen Grundlagen der Lebensmittelhygiene, Ihre persönlichen Hygienepflichten im Betrieb, und die Maßnahmen zum Schutz unserer Produkte und Verbraucher.',EN:'Welcome to the OSI Food Solutions Hygiene Training 2026. This training covers the legal basis of food hygiene, your personal hygiene obligations in the workplace, and measures to protect our products and consumers.',TR:'OSI Food Solutions 2026 Hijyen Eğitimine hoş geldiniz. Bu eğitim gıda hijyeninin yasal temellerini, kişisel hijyen yükümlülüklerinizi ve ürünlerimizi koruma önlemlerini kapsar.',RU:'Добро пожаловать на обучение по гигиене 2026 в OSI Food Solutions. Это обучение охватывает правовую основу гигиены пищевых продуктов, ваши личные обязанности по гигиене и меры по защите нашей продукции.'}},
+{id:2,img:'hygiene_images/image2.png',title:{DE:'Infektionsschutzgesetz – Zweck',EN:'Infection Protection Act – Purpose',TR:'Enfeksiyon Koruma Kanunu – Amaç',RU:'Закон о защите от инфекций – Цель'},narr:{DE:'Das Infektionsschutzgesetz hat einen klaren Zweck: die Übertragung von Infektionskrankheiten über Lebensmittel zu verhindern. Verantwortliches Handeln ist gesetzlich gefordert, nicht optional.',EN:'The Infection Protection Act has one clear purpose: to prevent the transmission of infectious diseases through food. Responsible behavior is a legal requirement, not optional.',TR:'Enfeksiyon Koruma Kanununun amacı açıktır: bulaşıcı hastalıkların gıdalar aracılığıyla bulaşmasını önlemek. Sorumlu davranış yasal bir gerekliliktir.',RU:'Закон о защите от инфекций преследует одну цель: предотвратить передачу инфекционных заболеваний через продукты питания. Ответственное поведение является законодательным требованием.'}},
+{id:3,img:'hygiene_images/image3.png',title:{DE:'Wichtige Paragraphen',EN:'Key Legal Sections',TR:'Önemli Yasal Maddeler',RU:'Ключевые правовые нормы'},narr:{DE:'Paragraph 42 regelt das Tätigkeitsverbot bei bestimmten Erkrankungen. Paragraph 43 regelt die Belehrungspflicht: jeder Mitarbeiter muss nachweislich über diese Regeln informiert worden sein.',EN:'Section 42 regulates the prohibition on activities under certain health conditions. Section 43 regulates the mandatory briefing: every employee must have been demonstrably informed of these rules.',TR:'Madde 42, belirli sağlık koşullarında faaliyet yasağını düzenler. Madde 43, zorunlu bilgilendirmeyi düzenler: her çalışan bu kurallar hakkında kanıtlanabilir şekilde bilgilendirilmiş olmalıdır.',RU:'Параграф 42 регулирует запрет деятельности при определённых заболеваниях. Параграф 43 регулирует обязательный инструктаж: каждый сотрудник должен быть документально ознакомлен с этими правилами.'}},
+{id:4,img:'hygiene_images/image4.png',title:{DE:'§42 – Tätigkeitsverbot',EN:'§42 – Prohibition on Activities',TR:'§42 – Faaliyet Yasağı',RU:'§42 – Запрет деятельности'},narr:{DE:'Ein Tätigkeitsverbot gilt bei Verdacht auf oder Erkrankung an: ansteckenden Magen-Darm-Erkrankungen, Typhus, Salmonellen, sowie infizierten Wunden oder Hauterkrankungen an Händen oder Unterarmen. Diese Bedingungen sind absolut – es gibt keine Ausnahmen.',EN:'A prohibition on activities applies in case of suspected or confirmed infectious gastrointestinal illness, typhoid, Salmonella, or infected wounds on the hands or forearms. These conditions are absolute – there are no exceptions.',TR:'Bulaşıcı mide-bağırsak hastalığı, tifo, Salmonella veya ellerde enfekte yaralar durumunda faaliyet yasağı uygulanır. Bu koşullar mutlaktır – istisna yoktur.',RU:'Запрет деятельности применяется при инфекционном желудочно-кишечном заболевании, брюшном тифе, сальмонеллёзе или инфицированных ранах на руках. Эти условия абсолютны — исключений нет.'}},
+{id:5,img:'hygiene_images/image5.png',title:{DE:'§42 – Anwendungsbereich',EN:'§42 – Scope of Application',TR:'§42 – Uygulama Kapsamı',RU:'§42 – Сфера применения'},narr:{DE:'Das Tätigkeitsverbot gilt, wenn betroffene Personen beim Herstellen oder Behandeln von Lebensmitteln direkt oder indirekt mit Produkten in Berührung kommen. Das betrifft nahezu alle Tätigkeiten in unserem Betrieb.',EN:'The prohibition applies when affected persons come into direct or indirect contact with food during production or handling. This applies to almost all activities in our facility.',TR:'Yasak, etkilenen kişilerin üretim veya işleme sırasında gıdalarla temas etmesi durumunda geçerlidir. Bu, tesisimizdeki neredeyse tüm faaliyetleri kapsar.',RU:'Запрет применяется, когда затронутые лица вступают в контакт с пищевыми продуктами при их производстве или обработке. Это распространяется практически на все виды деятельности на нашем предприятии.'}},
+{id:6,img:'hygiene_images/image6.png',title:{DE:'§43 – Belehrungspflicht',EN:'§43 – Mandatory Briefing',TR:'§43 – Zorunlu Bilgilendirme',RU:'§43 – Обязательный инструктаж'},narr:{DE:'Jede Person, die gewerbsmäßig Lebensmittel herstellt und dabei mit den Produkten in Berührung kommt, benötigt eine gültige Belehrungsbescheinigung. Diese Schulung ist Teil dieser Belehrungspflicht.',EN:'Every person who commercially produces food and comes into contact with the products requires a valid briefing certificate. This training is part of that mandatory briefing requirement.',TR:'Ticari olarak gıda üreten ve ürünlerle temas eden her kişinin geçerli bir bilgilendirme sertifikasına ihtiyacı vardır. Bu eğitim zorunlu bilgilendirmenin bir parçasıdır.',RU:'Каждый, кто производит пищевые продукты и вступает в контакт с ними, должен иметь действующий сертификат об инструктаже. Данное обучение является частью этого обязательного инструктажа.'}},
+{id:7,img:'hygiene_images/image7.png',title:{DE:'§43 – Warum Belehrung?',EN:'§43 – Why Briefing?',TR:'§43 – Neden Bilgilendirme?',RU:'§43 – Зачем инструктаж?'},narr:{DE:'Lebensmittel können mit Krankheitserregern kontaminiert sein. In bestimmten Lebensmitteln können sich Erreger besonders schnell vermehren. Ohne Kontrolle über den Gesundheitsstatus der Mitarbeiter ist das Risiko für Verbraucher nicht beherrschbar.',EN:'Food can be contaminated with pathogens. In certain foods, pathogens can multiply particularly quickly. Without monitoring employee health status, the risk to consumers cannot be managed.',TR:'Gıdalar patojenlerle kontamine olabilir. Belirli gıdalarda patojenler hızla çoğalabilir. Çalışanların sağlık durumu izlenmeden tüketici riski yönetilemez.',RU:'Продукты питания могут быть заражены патогенами. Без контроля состояния здоровья сотрудников риск для потребителей не может быть устранён.'}},
+{id:8,img:'hygiene_images/image8.png',title:{DE:'§43 – Konsequenzen',EN:'§43 – Consequences',TR:'§43 – Sonuçlar',RU:'§43 – Последствия'},narr:{DE:'Wenn ein Verbraucher kontaminierte Produkte aufnimmt, kann er schwer erkranken oder sterben. Besonders gefährdet sind Kleinkinder und ältere Menschen.',EN:'If a consumer ingests contaminated products, they can become seriously ill or die. Young children and elderly people are particularly at risk.',TR:'Bir tüketici kontamine ürün tüketirse ciddi şekilde hastalanabilir veya ölebilir. Küçük çocuklar ve yaşlılar özellikle risk altındadır.',RU:'Если потребитель употребляет заражённые продукты, он может серьёзно заболеть или умереть. Особому риску подвергаются маленькие дети и пожилые люди.'}},
+{id:9,img:'hygiene_images/image9.png',title:{DE:'§43 – Inhalt der Belehrung',EN:'§43 – Content of Briefing',TR:'§43 – Bilgilendirme İçeriği',RU:'§43 – Содержание инструктажа'},narr:{DE:'Die Belehrung muss zwei Kernpunkte sicherstellen: jeder Mitarbeiter kennt das Tätigkeitsverbot und weiß, dass er dem Arbeitgeber unverzüglich Bescheid geben muss, wenn Anzeichen einer Erkrankung auftreten.',EN:'The briefing must ensure two key points: every employee knows the prohibition on activities and knows they must immediately inform their employer upon noticing signs of illness.',TR:'Bilgilendirme iki temel noktayı sağlamalıdır: her çalışan faaliyet yasağını bilir ve hastalık belirtilerinde derhal işvereni bilgilendirmesi gerektiğini bilir.',RU:'Инструктаж должен обеспечивать два ключевых момента: каждый сотрудник знает запрет и обязан немедленно сообщить работодателю при появлении признаков болезни.'}},
+{id:10,img:'hygiene_images/image11.png',title:{DE:'Richtiges Handeln bei Erkrankung',EN:'Correct Action When Ill',TR:'Hastalık Durumunda Doğru Davranış',RU:'Правильные действия при болезни'},narr:{DE:'Das korrekte Vorgehen: Informieren Sie sofort Ihren Vorgesetzten. Suchen Sie einen Arzt auf. Teilen Sie dem Arzt mit, dass Sie in einem Lebensmittelbetrieb arbeiten. Das Beschäftigungsverbot wird erst aufgehoben, wenn der Arzt dies ausdrücklich bescheinigt.',EN:'The correct procedure: inform your supervisor immediately. See a doctor. Tell the doctor you work in a food production facility. The prohibition is only lifted when the doctor explicitly certifies this.',TR:'Doğru prosedür: amirinizi derhal bilgilendirin. Doktora gidin. Doktora gıda üretiminde çalıştığınızı söyleyin. Yasak yalnızca doktor onayladığında kalkar.',RU:'Правильная процедура: немедленно сообщите руководителю. Обратитесь к врачу. Сообщите врачу, что работаете на пищевом производстве. Запрет снимается только при наличии врачебного подтверждения.'}},
+{id:11,img:'hygiene_images/image12.png',title:{DE:'Falsches Handeln – Konsequenzen',EN:'Incorrect Action – Consequences',TR:'Yanlış Davranış – Sonuçları',RU:'Неправильные действия – последствия'},narr:{DE:'Verstöße gegen das IfSG haben ernsthafte Konsequenzen: strafrechtliche Folgen und möglicher Schadenersatz. Wer krank ist und trotzdem arbeitet, riskiert nicht nur die Gesundheit anderer, sondern auch rechtliche Konsequenzen für sich selbst.',EN:'Violations of the law have serious consequences: criminal liability and potential damages claims. Anyone who works while ill risks both the health of others and personal legal consequences.',TR:'Kanun ihlallerinin ciddi sonuçları vardır: cezai yaptırımlar ve tazminat talepleri. Hasta olup çalışan biri başkalarının sağlığını ve kendi hukuki sorumluluğunu riske atar.',RU:'Нарушения закона влекут уголовную ответственность и требования о возмещении ущерба. Тот, кто работает больным, рискует здоровьем других и собственной юридической ответственностью.'}},
+{id:12,img:'hygiene_images/image14.png',title:{DE:'Symptome von Infektionskrankheiten',EN:'Symptoms of Infectious Diseases',TR:'Bulaşıcı Hastalıkların Belirtileri',RU:'Симптомы инфекционных заболеваний'},narr:{DE:'Warnsymptome: Durchfall über mehrere Tage mit Übelkeit, Erbrechen oder Fieber. Hohes Fieber mit starken Schmerzen. Gelbfärbung der Haut – Hinweis auf Hepatitis. Schmierige oder eitrige Wunden. Bei diesen Symptomen sofort melden.',EN:'Warning symptoms: diarrhea for several days with nausea, vomiting or fever. High fever with severe pain. Yellowing of skin indicating Hepatitis. Weeping or purulent wounds. Report immediately upon any of these symptoms.',TR:'Uyarı belirtileri: bulantı, kusma veya ateşle birlikte ishal. Yüksek ateş. Sarı cilt. Akıntılı yaralar. Bu belirtilerde hemen bildirin.',RU:'Симптомы-предупреждения: диарея с тошнотой, рвотой или температурой. Высокая температура. Желтизна кожи. Гноящиеся раны. При наличии этих симптомов немедленно сообщайте.'}},
+{id:13,img:'hygiene_images/image15.png',title:{DE:'Lebensmittelsicherheit ist gesetzlich gefordert',EN:'Food Safety is a Legal Requirement',TR:'Gıda Güvenliği Yasal Zorunluluktur',RU:'Безопасность пищевых продуктов – законодательное требование'},narr:{DE:'Wer Lebensmittel für andere herstellt, trägt eine besondere Verantwortung. Lebensmittel müssen sicher und hygienisch produziert werden. Das ist nicht nur eine moralische Verpflichtung, sondern eine gesetzliche Anforderung.',EN:'Anyone who produces food for others bears a special responsibility. Food must be produced safely and hygienically. This is not only a moral obligation but a legal requirement.',TR:'Başkaları için gıda üreten herkes özel bir sorumluluk taşır. Gıdalar güvenli ve hijyenik şekilde üretilmelidir. Bu hem ahlaki hem yasal bir yükümlülüktür.',RU:'Тот, кто производит продукты питания для других, несёт особую ответственность. Продукты должны производиться безопасно и гигиенично. Это не только моральное, но и законодательное обязательство.'}},
+{id:14,img:'hygiene_images/image17.png',title:{DE:'Gesetzliche Grundlagen',EN:'Legal Framework',TR:'Yasal Çerçeve',RU:'Правовая база'},narr:{DE:'Die wesentlichen Rechtsgrundlagen: EU-Verordnung 178 aus 2002 bildet das Fundament des europäischen Lebensmittelrechts. Verordnung 852 gilt für alle Lebensmittelbetriebe. Verordnung 853 ist spezifisch für Lebensmittel tierischer Herkunft.',EN:'The key legal foundations: EU Regulation 178 of 2002 forms the basis of European food law. Regulation 852 applies to all food businesses. Regulation 853 is specific to food of animal origin.',TR:'Temel yasal dayanaklar: 2002 tarihli AB Yönetmeliği 178 Avrupa gıda hukukunun temelidir. Yönetmelik 852 tüm gıda işletmeleri için geçerlidir. Yönetmelik 853 hayvansal gıdalara özgüdür.',RU:'Ключевые правовые основы: Регламент ЕС 178 от 2002 года составляет основу европейского законодательства о пищевых продуктах. Регламент 852 применяется ко всем пищевым предприятиям. Регламент 853 специфичен для продуктов животного происхождения.'}},
+{id:15,img:'hygiene_images/image19.png',title:{DE:'Food Safety Always',EN:'Food Safety Always',TR:'Food Safety Always',RU:'Food Safety Always'},narr:{DE:'Bei OSI hat Lebensmittelsicherheit höchste Priorität. Unser Leitbild lautet Food Safety Always. Das ist keine einmalige Initiative, sondern eine langfristige Verpflichtung. Jeder Mitarbeiter trägt persönlich dazu bei.',EN:'At OSI, food safety is the highest priority. Our guiding principle is Food Safety Always. This is not a one-time initiative but a long-term commitment. Every employee contributes personally.',TR:"OSI'da gıda güvenliği en yüksek önceliktir. Rehber ilkemiz Food Safety Always'tir. Her çalışan kişisel olarak katkıda bulunur.",RU:'В OSI безопасность пищевых продуктов является высшим приоритетом. Наш руководящий принцип — Food Safety Always. Каждый сотрудник вносит личный вклад.'}},
+{id:16,img:'hygiene_images/image20.png',title:{DE:'Aufpassen',EN:'Be Alert',TR:'Dikkatli Ol',RU:'Будьте бдительны'},narr:{DE:'Der erste Grundsatz: Aufpassen. Beobachten Sie Ihre Umgebung aktiv. Erkennen Sie potenzielle Probleme, bevor sie zu Kontaminationen führen. Wachsamkeit ist der erste Schutzwall.',EN:'The first principle: Be alert. Actively observe your environment. Identify potential problems before they lead to contamination. Vigilance is the first line of defense.',TR:'Birinci ilke: Dikkatli ol. Çevrenizi aktif olarak gözlemleyin. Kontaminasyona yol açmadan önce sorunları tespit edin.',RU:'Первый принцип: Будьте бдительны. Активно наблюдайте за окружением. Выявляйте проблемы до того, как они приведут к заражению.'}},
+{id:17,img:'hygiene_images/image21.png',title:{DE:'Ansprechen',EN:'Speak Up',TR:'Sesini Yükselt',RU:'Говорите открыто'},narr:{DE:'Der zweite Grundsatz: Ansprechen. Wenn Sie etwas Falsches sehen, sprechen Sie es an. Schweigen ist keine Option. Eine Kultur der offenen Kommunikation schützt unsere Produkte.',EN:'The second principle: Speak up. If you see something wrong, say something. Silence is not an option. A culture of open communication protects our products.',TR:'İkinci ilke: Sesini yükselt. Yanlış bir şey görürsen söyle. Sessizlik seçenek değildir.',RU:'Второй принцип: Говорите открыто. Если видите что-то неправильное, скажите об этом. Молчание — не вариант.'}},
+{id:18,img:'hygiene_images/image22.jpeg',title:{DE:'Sofort handeln',EN:'Act Immediately',TR:'Hemen Harekete Geç',RU:'Действуйте немедленно'},narr:{DE:'Der dritte Grundsatz: Sofort handeln. Warten Sie nicht darauf, dass sich jemand anderes um ein Problem kümmert. Gehen Sie die Extrameile bei der Umsetzung von Lebensmittelsicherheitsprotokollen.',EN:'The third principle: Act immediately. Do not wait for someone else to deal with a problem. Go the extra mile in applying food safety protocols.',TR:'Üçüncü ilke: Hemen harekete geç. Başkasının sorunu çözmesini bekleme. Gıda güvenliği protokollerinde ekstra çaba göster.',RU:'Третий принцип: Действуйте немедленно. Не ждите, пока другой займётся проблемой. Прилагайте дополнительные усилия.'}},
+{id:19,img:'hygiene_images/image23.jpeg',title:{DE:'Wichtige Hygieneregeln',EN:'Key Hygiene Rules',TR:'Temel Hijyen Kuralları',RU:'Основные правила гигиены'},narr:{DE:'Vier Faktoren verhindern lebensmittelbedingte Erkrankungen: persönliche Hygiene, sauberes Zubehör, einwandfreie Produktionseinrichtung, und hygienisches Verarbeiten von Lebensmitteln.',EN:'Four factors prevent foodborne illness: personal hygiene, clean equipment, an impeccable production facility, and hygienic food handling.',TR:'Gıda kaynaklı hastalıkları önleyen dört faktör: kişisel hijyen, temiz ekipman, kusursuz üretim tesisi ve hijyenik gıda işleme.',RU:'Четыре фактора предотвращают пищевые заболевания: личная гигиена, чистое оборудование, безупречное производственное оборудование и гигиеничное обращение с продуктами.'}},
+{id:20,img:'hygiene_images/image24.png',title:{DE:'Persönliche Hygiene',EN:'Personal Hygiene',TR:'Kişisel Hijyen',RU:'Личная гигиена'},narr:{DE:'Persönliche Hygiene bedeutet: tägliche Körper- und Mundpflege, saubere kurz geschnittene unlackierte Fingernägel, gepflegte Kopf- und Barthaare, und saubere Arbeitskleidung bei jedem Schichtbeginn.',EN:'Personal hygiene means: daily personal and oral care, clean short unvarnished fingernails, well-kept hair and beard, and clean work clothing at the start of every shift.',TR:'Kişisel hijyen: günlük bakım, temiz kısa kesik cilasız tırnaklar, bakımlı saç ve sakal, her vardiyada temiz iş kıyafetleri.',RU:'Личная гигиена: ежедневный уход, чистые короткие ногти без лака, ухоженные волосы и борода, чистая рабочая одежда в начале каждой смены.'}},
+{id:21,img:'hygiene_images/image25.png',title:{DE:'Schwarzbereich – Umkleide',EN:'Black Zone – Changing Room',TR:'Siyah Bölge – Soyunma Odası',RU:'Чёрная зона – раздевалка'},narr:{DE:'Unser Betrieb ist in Schwarz- und Weißbereich unterteilt. Im Schwarzbereich befinden sich die Umkleiden für Privatkleidung. Männer und Frauen haben getrennte Räume. Diese Trennung ist eine Hygieneanforderung.',EN:'Our facility is divided into black and white zones. The black zone contains changing rooms for private clothing. Men and women have separate rooms. This separation is a hygiene requirement.',TR:'Tesisimiz siyah ve beyaz bölgelere ayrılmıştır. Siyah bölgede özel giysi için soyunma odaları vardır. Erkekler ve kadınlar için ayrı odalar bulunur.',RU:'Наше предприятие разделено на чёрную и белую зоны. В чёрной зоне находятся раздевалки для личной одежды. У мужчин и женщин отдельные помещения.'}},
+{id:22,img:'hygiene_images/image26.png',title:{DE:'Straßenkleidung aufbewahren',EN:'Storing Street Clothing',TR:'Sokak Kıyafetlerinin Saklanması',RU:'Хранение уличной одежды'},narr:{DE:'Im Schwarzbereich-Spind lagern Sie ausschließlich Straßenkleidung und alle privaten Gegenstände. Arbeitskittel und Arbeitshosen gehören nicht in den Schwarzbereich.',EN:'In the black zone locker, store only your street clothing and all personal items. Work coats and work trousers do not belong in the black zone.',TR:'Siyah bölge dolabında yalnızca sokak kıyafetleri ve kişisel eşyalar saklanır. İş önlükleri ve pantolonlar siyah bölgeye ait değildir.',RU:'В шкафчике чёрной зоны храните только уличную одежду и личные вещи. Рабочие халаты не относятся к чёрной зоне.'}},
+{id:23,img:'hygiene_images/image27.png',title:{DE:'Waschbeckenbereich',EN:'Handwashing Area',TR:'El Yıkama Alanı',RU:'Зона умывальников'},narr:{DE:'Zwischen Schwarz- und Weißbereich befindet sich der Waschbeckenbereich. Hier waschen und desinfizieren Sie die Hände, bevor Sie in die Produktion wechseln. Dieser Übergang ist bei jedem Eintritt obligatorisch.',EN:'Between the black and white zones is the handwashing area. Here you wash and disinfect your hands before entering production. This transition is mandatory at every entry.',TR:'Siyah ve beyaz bölgeler arasında el yıkama alanı bulunur. Üretime girmeden önce ellerinizi yıkayın ve dezenfekte edin.',RU:'Между чёрной и белой зонами находится зона умывальников. Здесь вы моете и дезинфицируете руки перед входом в производство.'}},
+{id:24,img:'hygiene_images/image28.png',title:{DE:'Weißbereich – Spind',EN:'White Zone – Locker',TR:'Beyaz Bölge – Dolap',RU:'Белая зона – шкафчик'},narr:{DE:'Im Weißbereich-Spind lagern Sie: Arbeitsschuhe, Anstoßkappe, Thermojacke, sowie Werkzeuge in einer kleinen Box. Alles was in die Produktion mitgenommen wird, gehört in den Weißbereich.',EN:'In the white zone locker, store: work shoes, bump cap, thermal jacket, and tools in a small box. Everything taken into production belongs in the white zone.',TR:'Beyaz bölge dolabında iş ayakkabıları, koruyucu kask, termal ceket ve aletler saklanır.',RU:'В шкафчике белой зоны храните рабочую обувь, защитный шлем, термокуртку и инструменты. Всё, что берётся в производство, принадлежит белой зоне.'}},
+{id:25,img:'hygiene_images/image29.png',title:{DE:'Anstoßkappen',EN:'Bump Caps',TR:'Koruyucu Kasket',RU:'Защитные каски'},narr:{DE:'Anstoßkappen sind für alle Mitarbeiter vorgeschrieben. Die Farbe richtet sich nach der Funktion: Produktionsmitarbeiter, Technik, Qualitätskontrolle tragen unterschiedliche Farben. Tragen Sie immer die für Ihre Funktion vorgesehene Anstoßkappe.',EN:'Bump caps are required for all employees. The color depends on the function: production staff, engineering, quality control wear different colors. Always wear the bump cap designated for your role.',TR:'Tüm çalışanlar için koruyucu kasket zorunludur. Renk göreve göre belirlenir. Her zaman göreviniz için belirlenen kasketi takın.',RU:'Защитные каски обязательны для всех сотрудников. Цвет зависит от должности. Всегда надевайте каску, предназначенную для вашей должности.'}},
+{id:26,img:'hygiene_images/image30.png',title:{DE:'Arbeitskleidung – Produktion',EN:'Work Clothing – Production',TR:'İş Kıyafetleri – Üretim',RU:'Рабочая одежда – производство'},narr:{DE:'Produktionsmitarbeiter tragen vollständige Schutzkleidung: Astrohaube plus Helm, Arbeitskittel, Handschuhe, Arbeitshose, Arbeitsschuhe, bei Bedarf Schürze und Ärmelschoner, sowie Gehörschutz. Alle Komponenten müssen vollständig und korrekt getragen werden.',EN:'Production employees wear full protective clothing: hair net plus bump cap, work coat, gloves, work trousers, work shoes, apron and arm protectors as required, and hearing protection. All components must be worn completely and correctly.',TR:'Üretim çalışanları tam koruyucu giysi giyer: Astrohaube artı kask, iş önlüğü, eldivenler, iş pantolonu, iş ayakkabıları ve kulak koruyucu.',RU:'Производственный персонал носит полную защитную одежду: сетку для волос и каску, рабочий халат, перчатки, рабочие брюки, рабочую обувь и средства защиты органов слуха.'}},
+{id:27,img:'hygiene_images/image31.png',title:{DE:'Arbeitskleidung – Kartonbühne',EN:'Work Clothing – Carton Platform',TR:'İş Kıyafetleri – Karton Platformu',RU:'Рабочая одежда – картонная платформа'},narr:{DE:'Mitarbeiter auf der Kartonbühne tragen braunen Kittel, Astrohaube, Gehörschutz, Arbeitshose und Arbeitsschuhe. Wichtig: Der weiße Produktionskittel darf nicht unter dem braunen Kittel angelassen werden.',EN:'Employees on the carton platform wear a brown coat, hair net, hearing protection, work trousers and work shoes. Important: the white production coat must not be worn underneath the brown coat.',TR:'Karton platformu çalışanları kahverengi önlük, Astrohaube, kulak koruyucu, iş pantolonu ve iş ayakkabısı giyer. Önemli: beyaz önlük kahverenginin altında bırakılmamalıdır.',RU:'Сотрудники на картонной платформе носят коричневый халат, сетку, защиту органов слуха, рабочие брюки и обувь. Важно: белый халат нельзя носить под коричневым.'}},
+{id:28,img:'hygiene_images/image32.png',title:{DE:'Saubere Arbeitskleidung',EN:'Clean Work Clothing',TR:'Temiz İş Kıyafetleri',RU:'Чистая рабочая одежда'},narr:{DE:'Regeln: Arbeitskittel mindestens täglich wechseln. Schürzen und Handschuhe regelmäßig reinigen. Außerhalb der Produktion Arbeitskittel ausziehen. Nach einem Feueralarm komplette Arbeitskleidung wechseln.',EN:'Rules: change your work coat at least daily. Regularly clean aprons and gloves. Remove work coat outside production. After a fire alarm, change all work clothing completely.',TR:'Kurallar: iş önlüğünü en az günlük değiştirin. Önlükleri düzenli temizleyin. Üretim dışında önlüğü çıkarın. Yangın alarmından sonra tüm kıyafetleri değiştirin.',RU:'Правила: меняйте рабочий халат не реже раза в день. Регулярно чистите фартуки. Снимайте халат за пределами производства. После пожарной тревоги полностью меняйте одежду.'}},
+{id:29,img:'hygiene_images/image33.jpeg',title:{DE:'Verbote in der Produktion',EN:'Prohibitions in Production',TR:'Üretimdeki Yasaklar',RU:'Запреты в производстве'},narr:{DE:'In der Produktion ausnahmslos verboten: Schmuck, künstliche oder lackierte Fingernägel, künstliche Wimpern, geruchsintensive Stoffe wie Parfum, übermäßiges Make-up, große Haarklammern, Kleidung mit Glitzer oder Pailletten, Schals und Kapuzen über der Arbeitskleidung.',EN:'Absolutely prohibited in production: jewelry, artificial or varnished nails, artificial eyelashes, strongly scented substances, excessive make-up, large hair clips, clothing with glitter or sequins, and scarves or hoods over work clothing.',TR:'Üretimde kesinlikle yasak: takı, yapay tırnaklar, yapay kirpikler, parfüm, aşırı makyaj, büyük saç tokaları, pul veya simli kıyafetler, atkılar ve kapüşonlar.',RU:'Категорически запрещено: украшения, искусственные ногти, искусственные ресницы, парфюм, чрезмерный макияж, большие заколки, блёстки и капюшоны поверх рабочей одежды.'}},
+{id:30,img:'hygiene_images/image34.jpeg',title:{DE:'Händehygiene – wann waschen?',EN:'Hand Hygiene – When to Wash',TR:'El Hijyeni – Ne Zaman?',RU:'Гигиена рук – когда мыть?'},narr:{DE:'Hände waschen und desinfizieren: vor jedem Eintritt in Produktionsräume, beim Wechsel des Arbeitsplatzes, nach Kontakt mit Abfällen oder Fleisch, nach Reinigungsarbeiten, nach jedem Toilettenbesuch, und nach dem Essen oder Rauchen.',EN:'Wash and disinfect hands: before every entry into production areas, when changing workstations, after contact with waste or meat, after cleaning work, after every toilet visit, and after eating or smoking.',TR:'Elleri yıkayın ve dezenfekte edin: üretim alanlarına her girişten önce, iş yeri değişikliklerinde, atık veya etle temastan sonra, temizlik sonrası, her tuvalet ziyaretinden sonra ve yemek veya sigara sonrası.',RU:'Мойте и дезинфицируйте руки: перед каждым входом в производство, при смене рабочего места, после контакта с отходами или мясом, после уборки, после каждого посещения туалета и после еды или курения.'}},
+{id:31,type:'video',vid:'videos/video_slide31.mp4',img:'hygiene_images/image73.png',title:{DE:'Ist das richtig? – Video 1',EN:'Is this correct? – Video 1',TR:'Bu doğru mu? – Video 1',RU:'Правильно ли это? – Видео 1'},narr:{DE:'Schauen Sie sich das folgende Video an. Beurteilen Sie danach, ob das gezeigte Verhalten richtig oder falsch ist.',EN:'Watch the following video carefully. Then decide whether the behavior shown is correct or incorrect.',TR:'Aşağıdaki videoyu dikkatle izleyin. Ardından davranışın doğru mu yanlış mı olduğuna karar verin.',RU:'Внимательно посмотрите видео. Затем определите, правильное ли показанное поведение.'},correct:'falsch',fb:{c:{DE:'Richtig erkannt. Das gezeigte Verhalten entspricht nicht unseren Hygienestandards.',EN:'Correctly identified. The behavior shown does not meet our hygiene standards.',TR:'Doğru tespit. Gösterilen davranış hijyen standartlarımızı karşılamamaktadır.',RU:'Правильно. Показанное поведение не соответствует нашим стандартам гигиены.'},w:{DE:'Nicht korrekt. Das gezeigte Verhalten ist falsch und verstößt gegen unsere Hygieneregeln.',EN:'Incorrect. The behavior shown is actually wrong and violates our hygiene rules.',TR:'Yanlış. Gösterilen davranış aslında hatalıdır.',RU:'Неверно. Показанное поведение на самом деле неправильное.'}}},
+{id:32,img:'hygiene_images/image76.png',title:{DE:'Wie wasche ich richtig meine Hände?',EN:'How to Wash Hands Correctly',TR:'Eller Nasıl Doğru Yıkanır?',RU:'Как правильно мыть руки?'},narr:{DE:'Die korrekte Handwaschroutine: Hände mit Seife waschen. Unter warmem Wasser gründlich abspülen. Mit frischem Einmalhandtuch abtrocknen. Desinfizieren und einreiben, bis die Hände trocken sind. Jeder Schritt ist notwendig.',EN:'The correct handwashing routine: wash with soap. Rinse thoroughly under warm water. Dry with a fresh disposable towel. Disinfect and rub until dry. Every step is necessary.',TR:'Doğru el yıkama: sabunla yıka, ılık suyla durula, temiz havluyla kurut, dezenfekte et ve ovuştur. Her adım gereklidir.',RU:'Правильная процедура: вымойте с мылом, тщательно ополосните тёплой водой, вытрите одноразовым полотенцем, продезинфицируйте и трите до высыхания.'}},
+{id:33,img:'hygiene_images/image79.png',title:{DE:'Wundversorgung',EN:'Wound Care',TR:'Yara Bakımı',RU:'Уход за ранами'},narr:{DE:'Wunden sorgfältig und wasserdicht abdecken. Ausschließlich blaue, metalldetektierbare Pflaster verwenden. Diese Farbe ermöglicht eine Erkennung durch unser Metalldetektionssystem.',EN:'Cover wounds carefully and in a waterproof manner. Only use blue metal-detectable plasters. This color enables detection by our metal detection system.',TR:'Yaraları dikkatli ve su geçirmez şekilde kapatın. Yalnızca mavi metal tespit edilebilir plasterlar kullanın.',RU:'Тщательно закрывайте раны водонепроницаемым образом. Используйте только синие пластыри, обнаруживаемые металлодетектором.'}},
+{id:34,img:'hygiene_images/image80.jpeg',title:{DE:'Astrohaube – Tragevorschrift',EN:'Hair Net – Wearing Rules',TR:'Astrohaube – Giyim Kuralları',RU:'Сетка для волос – правила ношения'},narr:{DE:'Beim Betreten der Produktion: zuerst Astrohaube anziehen, dann Kittel. Beim Verlassen: zuerst Kittel ausziehen, dann Astrohaube. Die Astrohaube muss über den Ohren getragen werden und darf nicht in der Kantine getragen werden.',EN:'When entering production: put on hair net first, then work coat. When leaving: remove work coat first, then hair net. The hair net must cover the ears and must not be worn in the canteen.',TR:'Üretime girerken: önce Astrohaube, sonra önlük. Çıkarken: önce önlük, sonra Astrohaube. Kulakları kapatmalı ve yemekhanede giyilmemelidir.',RU:'При входе: сначала сетка, затем халат. При выходе: сначала халат, затем сетка. Сетка должна закрывать уши и не надеваться в столовой.'}},
+{id:35,img:'hygiene_images/image81.jpeg',title:{DE:'Mund- und Bartschutz',EN:'Face Mask and Beard Cover',TR:'Maske ve Sakal Koruyucu',RU:'Маска и покрытие для бороды'},narr:{DE:'Mund- und Bartschutz ist vorgeschrieben, wo offen mit gewolftem Fleisch gearbeitet wird. Bartträger ziehen beim Betreten zuerst den Bartschutz an, dann den weißen Kittel. Der Bartschutz muss Mund und Nase vollständig bedecken.',EN:'Face mask and beard cover are required wherever open work with minced meat takes place. Those with beards put on the beard cover first, then the white coat. The beard cover must completely cover the mouth and nose.',TR:'Kıyılmış etle açık çalışmada maske ve sakal koruyucu zorunludur. Sakallılar önce sakal koruyucuyu, sonra beyaz önlüğü giyer.',RU:'Маска и покрытие для бороды обязательны при работе с фаршем. Те, у кого есть борода, сначала надевают покрытие для бороды, затем белый халат.'}},
+{id:36,img:'hygiene_images/image82.png',title:{DE:'Handschuhe',EN:'Gloves',TR:'Eldivenler',RU:'Перчатки'},narr:{DE:'Handschuhe sind beim Berühren von Fleisch Pflicht. Fleisch darf ausschließlich mit Einweghandschuhen berührt werden. Wenn ein Patty herunterfällt, müssen die Handschuhe sofort gewechselt werden. Handschuhe werden erst nach der Hygieneschleuse angezogen und beim Verlassen entsorgt.',EN:'Gloves are mandatory when touching meat. Meat may only be touched with disposable gloves. If a patty falls, gloves must be changed immediately. Gloves are put on after the hygiene lock and disposed of when leaving.',TR:'Etle temas edilirken eldiven zorunludur. Köfte düşerse eldivenler hemen değiştirilir. Eldivenler hijyen kilidi sonrası giyilir ve çıkışta atılır.',RU:'Перчатки обязательны при прикосновении к мясу. При падении котлеты перчатки меняют немедленно. Перчатки надевают после гигиенического шлюза и утилизируют при выходе.'}},
+{id:37,type:'video',vid:'videos/video_slide37.mp4',img:'hygiene_images/image86.png',title:{DE:'Ist das richtig? – Video 2',EN:'Is this correct? – Video 2',TR:'Bu doğru mu? – Video 2',RU:'Правильно ли это? – Видео 2'},narr:{DE:'Schauen Sie sich das folgende Video an und beurteilen Sie das gezeigte Verhalten.',EN:'Watch the following video and evaluate the behavior shown.',TR:'Aşağıdaki videoyu izleyin ve gösterilen davranışı değerlendirin.',RU:'Посмотрите следующее видео и оцените показанное поведение.'},correct:'falsch',fb:{c:{DE:'Richtig. Das gezeigte Verhalten ist nicht korrekt.',EN:'Correct. The behavior shown is not acceptable.',TR:'Doğru. Gösterilen davranış kabul edilemez.',RU:'Верно. Показанное поведение недопустимо.'},w:{DE:'Falsch. Das Verhalten ist tatsächlich nicht korrekt.',EN:'Wrong. The behavior is actually incorrect.',TR:'Yanlış. Davranış aslında doğru değildir.',RU:'Неверно. Поведение на самом деле неправильное.'}}},
+{id:38,img:'hygiene_images/image87.png',title:{DE:'Handschuhe – gewürzt / ungewürzt',EN:'Gloves – Seasoned / Unseasoned',TR:'Eldivenler – Baharatlı / Baharatsız',RU:'Перчатки – приправленное/неприправленное'},narr:{DE:'Ungewürzte und gewürzte Produkte werden in getrennten Bereichen verarbeitet. Die Handschuhe dürfen nicht zwischen den Bereichen gewechselt werden. Beachten Sie die farbliche Kennzeichnung.',EN:'Unseasoned and seasoned products are processed in separate areas. Gloves must not be swapped between areas. Observe the color coding.',TR:'Baharatsız ve baharatlı ürünler ayrı alanlarda işlenir. Eldivenler alanlar arasında değiştirilemez.',RU:'Неприправленные и приправленные продукты обрабатываются в отдельных зонах. Перчатки нельзя переносить между зонами.'}},
+{id:39,img:'hygiene_images/image88.png',title:{DE:'Aufteilung gewürzt / ungewürzt',EN:'Seasoned / Unseasoned Separation',TR:'Baharatlı / Baharatsız Ayrımı',RU:'Разделение зон'},narr:{DE:'Die räumliche Trennung zwischen gewürzten und ungewürzten Produkten ist klar definiert. Jede Vermischung stellt ein Produktsicherheitsrisiko und einen Kennzeichnungsverstoß dar.',EN:'The spatial separation between seasoned and unseasoned products is clearly defined. Any mixing constitutes a product safety risk and a labeling violation.',TR:'Baharatlı ve baharatsız ürünler arasındaki ayrım açıkça tanımlanmıştır. Karışım ürün güvenliği riski ve etiketleme ihlalidir.',RU:'Пространственное разделение между приправленными и неприправленными продуктами чётко определено. Любое смешивание является нарушением.'}},
+{id:40,img:'hygiene_images/image89.png',title:{DE:'Sortierung – Konfiskat',EN:'Sorting – Confiscate Waste',TR:'Ayıklama – Konfiskat',RU:'Сортировка – конфискованные отходы'},narr:{DE:'Konfiskat ist Hackfleisch und Patties zur Entsorgung: Knorpel, Knochen, Fremdkörper, auf den Boden gefallenes Fleisch. Konfiskat wird ausschließlich in den dafür vorgesehenen Behältern gesammelt.',EN:'Confiscate waste is minced meat and patties for disposal: cartilage, bones, foreign objects, meat fallen on the floor. Confiscate waste is collected exclusively in designated containers.',TR:'Konfiskat bertaraf için kıyma ve köftedir: kıkırdak, kemik, yabancı cisimler, yere düşen et. Yalnızca belirlenmiş kaplarda toplanır.',RU:'Конфискованные отходы — фарш и котлеты для утилизации: хрящи, кости, посторонние предметы, мясо упавшее на пол. Собираются исключительно в специальные контейнеры.'}},
+{id:41,img:'hygiene_images/image90.png',title:{DE:'Sortierung – Rework',EN:'Sorting – Rework',TR:'Ayıklama – Rework',RU:'Сортировка – повторная обработка'},narr:{DE:'Rework ist einwandfreies, genusstaugliches Hackfleisch zur Wiederverarbeitung. Es wird nur in dafür vorgesehenen Behältern gesammelt. Die Verwechslung von Konfiskat und Rework ist ein schwerwiegender Fehler.',EN:'Rework is intact fit-for-consumption minced meat for reprocessing. Collected only in designated containers. Confusing confiscate waste with rework is a serious error.',TR:'Rework yeniden işleme için sağlam kıymadır. Yalnızca belirlenmiş kaplarda toplanır. Konfiskatla karıştırmak ciddi bir hatadır.',RU:'Повторная обработка — целый пригодный к употреблению фарш для переработки. Путаница с конфискованными отходами — серьёзная ошибка.'}},
+{id:42,img:'hygiene_images/image91.png',title:{DE:'Allgemeine Verhaltensregeln',EN:'General Conduct Rules',TR:'Genel Davranış Kuralları',RU:'Общие правила поведения'},narr:{DE:'Weitere wichtige Regeln: Abfälle rasch beseitigen. Nicht in der Produktion essen oder trinken. Beim Husten in die Ellenbeuge husten, von Produkt abgewandt. Meldepflicht nach dem IfSG einhalten.',EN:'Further important rules: remove waste promptly. Do not eat or drink in production. When coughing, cough into the crook of your arm, away from products. Comply with the mandatory reporting obligation.',TR:'Ek kurallar: atıkları hemen bertaraf edin. Üretimde yemek yemeyin. Öksürürken kolunuzun iç kısmına öksürün. Bildirim yükümlülüğüne uyun.',RU:'Дополнительные правила: своевременно удаляйте отходы. Не ешьте в производстве. При кашле — в сгиб локтя, подальше от продуктов. Соблюдайте обязательную отчётность.'}},
+{id:43,img:'hygiene_images/image92.png',title:{DE:'Wareneingang',EN:'Goods Receipt',TR:'Mal Kabulü',RU:'Приёмка товара'},narr:{DE:'Im Wareneingang werden alle eingehenden Rohstoffe auf vier Kriterien geprüft: Verpackung auf Unversehrtheit, Frische des Produkts, Mindesthaltbarkeitsdatum, und korrekte Kennzeichnung.',EN:'At goods receipt all incoming raw materials are checked on four criteria: integrity of packaging, freshness, best before date, and correct labeling.',TR:'Mal kabulünde tüm ham maddeler dört kritere göre kontrol edilir: ambalaj bütünlüğü, tazelik, son kullanma tarihi ve doğru etiketleme.',RU:'При приёмке товара все сырьевые материалы проверяются по четырём критериям: целостность упаковки, свежесть, срок годности и правильная маркировка.'}},
+{id:44,type:'video',vid:'videos/video_slide44.mp4',img:'hygiene_images/image100.png',title:{DE:'Ist das richtig? – Video 3',EN:'Is this correct? – Video 3',TR:'Bu doğru mu? – Video 3',RU:'Правильно ли это? – Видео 3'},narr:{DE:'Schauen Sie sich das folgende Video an und beurteilen Sie das gezeigte Verhalten.',EN:'Watch the following video and evaluate the behavior shown.',TR:'Aşağıdaki videoyu izleyin ve gösterilen davranışı değerlendirin.',RU:'Посмотрите следующее видео и оцените показанное поведение.'},correct:'falsch',fb:{c:{DE:'Richtig erkannt.',EN:'Correctly identified.',TR:'Doğru tespit.',RU:'Правильно определено.'},w:{DE:'Nicht korrekt. Das gezeigte Verhalten ist falsch.',EN:'Incorrect. The behavior shown is wrong.',TR:'Yanlış. Gösterilen davranış hatalıdır.',RU:'Неверно. Показанное поведение неправильное.'}}},
+{id:45,img:'hygiene_images/image101.png',title:{DE:'Mobiltelefone und persönliche Gegenstände',EN:'Mobile Phones and Personal Items',TR:'Cep Telefonları ve Kişisel Eşyalar',RU:'Мобильные телефоны и личные вещи'},narr:{DE:'Smartphones und alle anderen persönlichen Gegenstände sind in der Produktion wegen Fremdkörpergefahr verboten. Das gilt auch für private Schlüssel. Kein Gerät, kein Schmuck, kein privater Gegenstand gehört in den Produktionsbereich.',EN:'Smartphones and all other personal items are prohibited in production due to the risk of foreign body contamination. This also applies to private keys. No device, jewelry or personal item belongs in the production area.',TR:'Akıllı telefonlar ve tüm kişisel eşyalar yabancı cisim riski nedeniyle üretimde yasaktır. Özel anahtarlar da dahildir.',RU:'Смартфоны и все личные вещи запрещены в производстве из-за риска заражения посторонними предметами. Личные ключи также запрещены.'}},
+{id:46,type:'video',vid:'videos/video_slide46.mp4',img:'hygiene_images/image112.png',title:{DE:'Ist das richtig? – Video 4',EN:'Is this correct? – Video 4',TR:'Bu doğru mu? – Video 4',RU:'Правильно ли это? – Видео 4'},narr:{DE:'Letztes Video. Beurteilen Sie auch hier das gezeigte Verhalten.',EN:'Final video. Evaluate the behavior shown here as well.',TR:'Son video. Burada gösterilen davranışı da değerlendirin.',RU:'Последнее видео. Оцените также показанное здесь поведение.'},correct:'falsch',fb:{c:{DE:'Richtig erkannt.',EN:'Correctly identified.',TR:'Doğru tespit.',RU:'Правильно определено.'},w:{DE:'Nicht korrekt.',EN:'Incorrect.',TR:'Yanlış.',RU:'Неверно.'}}},
+{id:47,img:'hygiene_images/image113.jpeg',title:{DE:'Kugelschreiber in der Produktion',EN:'Pens in Production',TR:'Üretimde Kalemler',RU:'Ручки в производстве'},narr:{DE:'Ausschließlich nummerierte Metallkugelschreiber sind in der Produktion erlaubt. Private Kugelschreiber sind ein Fremdkörperrisiko und gehören nicht in die Produktion.',EN:'Only numbered metal ballpoint pens are permitted in production. Private pens are a foreign body risk and do not belong in production.',TR:'Üretimde yalnızca numaralı metal tükenmez kalemlerine izin verilir. Özel kalemler yabancı cisim riskidir.',RU:'В производстве разрешены только пронумерованные металлические ручки. Личные ручки являются риском постороннего предмета.'}},
+{id:48,img:'hygiene_images/image114.png',title:{DE:'Schädlinge',EN:'Pests',TR:'Zararlılar',RU:'Вредители'},narr:{DE:'Schädlinge wie Insekten, Nagetiere, Fliegen und Schaben können unbemerkt eingetragen werden. Wir kontrollieren dieses Risiko durch regelmäßige Kontrollen durch unseren Schädlingsbekämpfer und die Aufmerksamkeit aller Mitarbeiter. Melden Sie jeden Schädlingssichtung sofort.',EN:'Pests such as insects, rodents, flies and cockroaches can be introduced unnoticed. We manage this risk through regular checks and employee vigilance. Report any pest sighting immediately.',TR:'Böcekler, kemirgenler, sinekler ve hamamböcekleri fark edilmeden giriş yapabilir. Her zararlı görüldüğünde derhal bildirin.',RU:'Вредители могут быть занесены незаметно. Немедленно сообщайте о любом замеченном вредителе.'}},
+{id:49,img:'hygiene_images/image115.png',title:{DE:'Chemische Gefahren',EN:'Chemical Hazards',TR:'Kimyasal Tehlikeler',RU:'Химические опасности'},narr:{DE:'Chemische Gefahren entstehen durch Pestizide, Antibiotika, Reinigungs- und Desinfektionsmittel, Schmierstoffe und Allergene. Vermeidung erfolgt durch einwandfreie Rohstoffe und gründliche Reinigung.',EN:'Chemical hazards arise from pesticides, antibiotics, cleaning agents, lubricants and allergens. Prevention is achieved through impeccable raw materials and thorough cleaning.',TR:'Kimyasal tehlikeler pestisitler, antibiyotikler, temizlik maddeleri, yağlayıcılar ve alerjenlerden kaynaklanır.',RU:'Химические опасности возникают от пестицидов, антибиотиков, моющих средств, смазочных материалов и аллергенов.'}},
+{id:50,img:'hygiene_images/image116.png',title:{DE:'Reinigung und Desinfektion',EN:'Cleaning and Disinfection',TR:'Temizlik ve Dezenfeksiyon',RU:'Очистка и дезинфекция'},narr:{DE:'Zur Reinigung wird der Hochdruckreiniger verwendet. Wischtücher und Lappen sind verboten. Desinfektionsmittel wirken nur auf gereinigten und trockenen Flächen – Reinigung muss vor der Desinfektion abgeschlossen sein.',EN:'High-pressure cleaners are used for cleaning. Cloths and rags are prohibited. Disinfectants only work on cleaned and dry surfaces – cleaning must be completed before disinfection.',TR:'Temizlik için yüksek basınçlı temizleyiciler kullanılır. Bezler yasaktır. Dezenfektanlar yalnızca temizlenmiş ve kuru yüzeylerde etkilidir.',RU:'Для очистки используются мойки высокого давления. Тряпки запрещены. Дезинфицирующие средства действуют только на очищенных и сухих поверхностях.'}},
+{id:51,img:'hygiene_images/image117.png',title:{DE:'Food Defense',EN:'Food Defense',TR:'Gıda Savunması',RU:'Защита пищевых продуктов'},narr:{DE:'Food Defense bedeutet: Schutz unserer Produkte vor absichtlicher Kontamination. Jeder Mitarbeiter soll wachsam sein. Auffälligkeiten sofort dem QK-Schichtführer melden.',EN:'Food Defense means protecting our products from intentional contamination. Every employee must be vigilant. Report any suspicious activity immediately to the QC shift leader.',TR:'Gıda savunması ürünlerimizi kasıtlı kontaminasyondan korumak anlamına gelir. Her şüpheli durumu hemen bildirin.',RU:'Защита пищевых продуктов означает защиту от преднамеренного загрязнения. Немедленно сообщайте о любой подозрительной деятельности.'}},
+{id:52,img:'hygiene_images/image118.png',title:{DE:'Food Fraud',EN:'Food Fraud',TR:'Gıda Sahtekarlığı',RU:'Фальсификация пищевых продуктов'},narr:{DE:'Food Fraud ist das vorsätzliche Inverkehrbringen von Lebensmitteln zur Täuschung von Verbrauchern. Jeder Verdacht muss sofort gemeldet werden.',EN:'Food fraud is the deliberate placing on the market of food intended to deceive consumers. Any suspicion must be reported immediately.',TR:'Gıda sahtekarlığı tüketicileri yanıltmak amacıyla gıdaların kasıtlı piyasaya sürülmesidir. Her şüphe derhal bildirilmelidir.',RU:'Фальсификация — преднамеренный выпуск продуктов питания с целью обмана потребителей. Любое подозрение должно быть немедленно сообщено.'}},
+{id:53,img:'hygiene_images/image119.png',title:{DE:'Hauptallergene',EN:'Major Allergens',TR:'Ana Alerjenler',RU:'Основные аллергены'},narr:{DE:'Vierzehn kennzeichnungspflichtige Hauptallergene: glutenhaltiges Getreide, Milch, Fisch, Eier, Sellerie, Schalenfrüchte, Erdnüsse, Schwefeldioxid, Soja, Senf, Sesamsaat, Krebstiere, Weichtiere und Lupine. Alle 14 müssen bei Produktion und Kennzeichnung berücksichtigt werden.',EN:'Fourteen mandatory labeling allergens: gluten-containing cereals, milk, fish, eggs, celery, nuts, peanuts, sulphur dioxide, soy, mustard, sesame, crustaceans, molluscs and lupin. All 14 must be considered in production and labeling.',TR:'On dört zorunlu alerjen: glutenli tahıllar, süt, balık, yumurta, kereviz, kuruyemişler, fıstık, sülfit, soya, hardal, susam, kabuklu deniz ürünleri, yumuşakçalar ve lupin.',RU:'Четырнадцать обязательных аллергенов: глютеносодержащие злаки, молоко, рыба, яйца, сельдерей, орехи, арахис, сульфиты, соя, горчица, кунжут, ракообразные, моллюски и люпин.'}},
+{id:54,img:'hygiene_images/image120.png',title:{DE:'Problematik für Allergiker',EN:'Allergy Risk',TR:'Alerji Riski',RU:'Риск аллергии'},narr:{DE:'Bereits geringste Mengen eines Allergens können bei Allergikern eine ernsthafte Reaktion auslösen. Kreuzverunreinigungen durch unsachgemäße Reinigung können lebensbedrohliche Folgen haben.',EN:'Even the smallest amounts of an allergen can trigger a serious reaction in allergy sufferers. Cross-contamination from improper cleaning can have life-threatening consequences.',TR:'En küçük miktarda alerjen bile ciddi reaksiyona yol açabilir. Uygunsuz temizlikten kaynaklanan çapraz kontaminasyon hayatı tehdit edebilir.',RU:'Даже малейшее количество аллергена может вызвать серьёзную реакцию. Перекрёстное загрязнение может иметь опасные для жизни последствия.'}},
+{id:55,img:'hygiene_images/image121.jpeg',title:{DE:'Symptome allergischer Reaktionen',EN:'Symptoms of Allergic Reactions',TR:'Alerjik Reaksiyon Belirtileri',RU:'Симптомы аллергических реакций'},narr:{DE:'Allergische Reaktionen können betreffen: Haut mit Ausschlag und Schwellungen, Atemwege mit Asthma, Herz-Kreislauf-System mit anaphylaktischem Schock, Magen-Darm-Trakt mit Durchfall und Erbrechen. Im schlimmsten Fall ist eine Allergenreaktion tödlich.',EN:'Allergic reactions can affect: skin with rashes and swellings, airways with asthma, cardiovascular system with anaphylactic shock, gastrointestinal tract with diarrhea and vomiting. In the worst case a reaction is fatal.',TR:'Alerjik reaksiyonlar: deri döküntüleri, astım, anafilaktik şok, ishal ve kusma. En kötü durumda ölümcüldür.',RU:'Аллергические реакции затрагивают кожу, дыхательные пути, сердечно-сосудистую и желудочно-кишечную системы. В худшем случае реакция смертельна.'}},
+{id:56,img:'hygiene_images/image122.png',title:{DE:'Allergene – Umgang',EN:'Allergen Management',TR:'Alerjen Yönetimi',RU:'Управление аллергенами'},narr:{DE:'Korrekter Umgang mit Allergenen: gründliches Reinigen und Desinfizieren aller Behälter, Geräte und Arbeitsflächen gemäß den Arbeitsanweisungen. Regelmäßige Schulung aller Mitarbeiter.',EN:'Correct allergen management: thorough cleaning and disinfecting of all containers, equipment and work surfaces in accordance with work instructions. Regular training of all employees.',TR:'Doğru alerjen yönetimi: tüm ekipmanların çalışma talimatlarına göre kapsamlı temizliği ve dezenfeksiyonu.',RU:'Правильное управление аллергенами: тщательная очистка и дезинфекция всего оборудования согласно рабочим инструкциям.'}},
+{id:57,img:'hygiene_images/image123.png',title:{DE:'Mikroorganismen',EN:'Microorganisms',TR:'Mikroorganizmalar',RU:'Микроорганизмы'},narr:{DE:'Biologische Gefahren umfassen Bakterien, Viren, Schimmelpilze und Hefezellen. Bakterien sind allgegenwärtig. Ob sie wachsen hängt ab von: Lebensmittelart, Feuchtigkeit, pH-Wert, Wärme, Sauerstoff und Zeit.',EN:'Biological hazards include bacteria, viruses, molds and yeast cells. Bacteria are everywhere. Whether they grow depends on: food type, moisture, pH, heat, oxygen and time.',TR:'Biyolojik tehlikeler bakteriler, virüsler, küfler ve maya hücrelerini içerir. Bakteriler her yerdedir. Büyümeleri gıda türü, nem, pH, sıcaklık, oksijen ve zamana bağlıdır.',RU:'Биологические опасности включают бактерии, вирусы, плесень и дрожжи. Бактерии есть везде. Их рост зависит от типа продукта, влажности, pH, тепла, кислорода и времени.'}},
+{id:58,img:'hygiene_images/image124.jpeg',title:{DE:'Mögliche Gefahren im Überblick',EN:'Overview of Possible Hazards',TR:'Olası Tehlikelere Genel Bakış',RU:'Обзор возможных опасностей'},narr:{DE:'Überblick über alle Gefahrenkategorien: biologische Gefahren durch Mikroorganismen und Schädlinge, physikalische durch Fremdkörper, chemische durch Rückstände, sowie intentionale Gefahren durch Food Fraud und Food Defense-Verletzungen.',EN:'Overview of all hazard categories: biological hazards from microorganisms and pests, physical from foreign objects, chemical from residues, and intentional hazards from food fraud and food defense violations.',TR:'Tüm tehlike kategorilerine genel bakış: biyolojik, fiziksel, kimyasal ve kasıtlı tehlikeler.',RU:'Обзор всех категорий опасностей: биологические, физические, химические и преднамеренные опасности.'}},
+{id:59,img:'hygiene_images/image125.jpeg',title:{DE:'Regelung Raucherkabine',EN:'Smoking Area Rules',TR:'Sigara İçme Alanı Kuralları',RU:'Правила зоны для курения'},narr:{DE:'Die Raucherkabine befindet sich auf dem Freigelände neben dem Drehkreuz. Das korrekte Vorgehen: Arbeitsschuhe im Weißbereich verstauen, weiße Arbeitskleidung aufhängen, Privatkleidung anziehen, dann rauchen. Das Gebäude darf nicht in weißer Arbeitskleidung verlassen werden.',EN:'The smoking cabin is located on the outdoor area next to the turnstile. Correct procedure: store work shoes in the white zone, hang white work clothing, put on private clothing, then smoke. The building must not be left in white work clothing.',TR:'Sigara kabini dönme kapısının yanındaki açık alandadır. Doğru prosedür: iş ayakkabılarını dolaba koy, beyaz kıyafetleri as, özel kıyafetleri giy, sonra sigara iç.',RU:'Кабина для курения расположена рядом с турникетом. Правильная процедура: уберите рабочую обувь, повесьте белую одежду, оденьтесь в личную одежду, затем курите.'}},
+{id:60,img:'hygiene_images/image126.jpeg',title:{DE:'Schulungsnachweis',EN:'Training Certificate',TR:'Eğitim Sertifikası',RU:'Свидетельство об обучении'},narr:{DE:'Sie haben die Hygieneschulung 2026 abgeschlossen. Im Anschluss folgen der Wissenstest, die Bewertung dieser Schulung, und Ihre digitale Unterschrift. Dieser Schulungsnachweis wird elektronisch gespeichert.',EN:'You have completed the Hygiene Training 2026. Next follows the knowledge test, the training evaluation, and your digital signature. This training record will be stored electronically.',TR:'2026 Hijyen Eğitimini tamamladınız. Ardından bilgi testi, değerlendirme ve dijital imza gelecektir.',RU:'Вы завершили обучение по гигиене 2026 года. Далее следуют тест знаний, оценка обучения и ваша цифровая подпись.'}},
+{id:61,img:'hygiene_images/image127.png',title:{DE:'Abschluss',EN:'Completion',TR:'Tamamlama',RU:'Завершение'},narr:{DE:'Herzlichen Dank für Ihre Aufmerksamkeit. Food Safety Always.',EN:'Thank you for your attention. Food Safety Always.',TR:'Dikkatiniz için teşekkür ederiz. Food Safety Always.',RU:'Спасибо за ваше внимание. Food Safety Always.'}}
+];
+
+const QUIZ={
+DE:{questions:[
+{q:'Was regelt §42 IfSG?',opts:['Urlaubsanspruch','Tätigkeitsverbot bei Infektionskrankheiten','Reinigungsfrequenz','Arbeitszeiten'],c:1},
+{q:'Was müssen Sie bei Symptomen einer Infektionskrankheit tun?',opts:['Warten bis Schichtende','Weiterarbeiten ohne Fieber','Sofort Vorgesetzten informieren und Arzt aufsuchen','Nur melden bei Durchfall über 3 Tage'],c:2},
+{q:'Welche Pflaster müssen in der Produktion verwendet werden?',opts:['Weiße Standard-Pflaster','Transparente Pflaster','Blaue metalldetektierbare Pflaster','Hautfarbene Pflaster'],c:2},
+{q:'Was gehört NICHT in den Schwarzbereich-Spind?',opts:['Privatkleidung','Handy','Brotzeit','Arbeitskittel'],c:3},
+{q:'In welcher Reihenfolge wird die Astrohaube getragen?',opts:['Kittel anziehen, dann Astrohaube','Astrohaube anziehen, dann Kittel','Reihenfolge ist gleichgültig','Nur beim Eintreten relevant'],c:1},
+{q:'Was ist Konfiskat?',opts:['Wiederverwendbares Fleisch','Gewürztes Hackfleisch','Hackfleisch und Patties zur Entsorgung','Rohes ungemahlenes Fleisch'],c:2},
+{q:'Warum sind Smartphones in der Produktion verboten?',opts:['Datenschutz','Fremdkörpergefahr','Elektromagnetische Störungen','Sie sind nicht verboten'],c:1},
+{q:'Desinfektionsmittel wirkt nur auf...',opts:['nassen Flächen','gereinigten und trockenen Flächen','verschmutzten Flächen','Metalloberflächen'],c:1},
+{q:'Wie viele kennzeichnungspflichtige Hauptallergene gibt es?',opts:['7','10','14','20'],c:2},
+{q:'Was bedeutet Food Safety Always?',opts:['Einmalige Hygieneinitiative','Gesetzliches Zertifizierungsverfahren','Langfristige Verpflichtung zur Lebensmittelsicherheitskultur','Interner Auditstandard'],c:2}
+]},
+EN:{questions:[
+{q:'What does §42 IfSG regulate?',opts:['Holiday entitlement','Prohibition on activities for infectious diseases','Cleaning frequency','Working hours'],c:1},
+{q:'What must you do when you notice symptoms of an infectious disease?',opts:['Wait until shift ends','Continue working if no fever','Immediately inform supervisor and see a doctor','Only report if diarrhea lasts more than 3 days'],c:2},
+{q:'Which plasters must be used in production?',opts:['White standard plasters','Transparent plasters','Blue metal-detectable plasters','Skin-colored plasters'],c:2},
+{q:'What does NOT belong in the black zone locker?',opts:['Private clothing','Mobile phone','Food','Work coat'],c:3},
+{q:'In which order is the hair net worn?',opts:['Put on coat first, then hair net','Put on hair net first, then coat','Order does not matter','Only relevant when entering'],c:1},
+{q:'What is confiscate waste?',opts:['Reusable meat','Seasoned minced meat','Minced meat and patties for disposal','Raw unground meat'],c:2},
+{q:'Why are smartphones prohibited in production?',opts:['Data protection','Risk of foreign body contamination','Electromagnetic interference','They are not prohibited'],c:1},
+{q:'Disinfectants only work on...',opts:['wet surfaces','cleaned and dry surfaces','dirty surfaces','metal surfaces'],c:1},
+{q:'How many mandatory labeling allergens are there?',opts:['7','10','14','20'],c:2},
+{q:'What does Food Safety Always mean?',opts:['A one-time hygiene initiative','A legal certification procedure','A long-term commitment to food safety culture','An internal audit standard'],c:2}
+]},
+TR:{questions:[
+{q:'§42 IfSG neyi düzenler?',opts:['İzin hakları','Bulaşıcı hastalıklar için faaliyet yasağı','Temizleme sıklığı','Çalışma saatleri'],c:1},
+{q:'Bulaşıcı hastalık belirtilerinde ne yapmalısınız?',opts:['Vardiya bitene kadar bekleyin','Ateş yoksa çalışmaya devam edin','Derhal amiri bilgilendirin ve doktora gidin','Yalnızca 3 günden uzun süren ishalde bildirin'],c:2},
+{q:'Üretimde hangi plasterlar kullanılmalıdır?',opts:['Beyaz standart','Şeffaf','Mavi metal tespit edilebilir','Ten rengi'],c:2},
+{q:'Siyah bölge dolabına ne ait DEĞİLDİR?',opts:['Özel kıyafetler','Cep telefonu','Yiyecek','İş önlüğü'],c:3},
+{q:'Astrohaube hangi sırayla giyilir?',opts:['Önce önlük sonra Astrohaube','Önce Astrohaube sonra önlük','Sıra önemli değil','Yalnızca girişte geçerli'],c:1},
+{q:'Konfiskat nedir?',opts:['Yeniden kullanılabilir et','Baharatlı kıyma','Bertaraf için kıyma ve köfte','Ham öğütülmemiş et'],c:2},
+{q:'Akıllı telefonlar neden yasaktır?',opts:['Veri koruma','Yabancı cisim riski','Elektromanyetik girişim','Yasak değiller'],c:1},
+{q:'Dezenfektanlar yalnızca ... üzerinde çalışır.',opts:['ıslak yüzeyler','temizlenmiş ve kuru yüzeyler','kirli yüzeyler','metal yüzeyler'],c:1},
+{q:'Kaç zorunlu etiketleme alerjeni vardır?',opts:['7','10','14','20'],c:2},
+{q:'Food Safety Always ne anlama gelir?',opts:['Tek seferlik hijyen girişimi','Yasal sertifikasyon','Gıda güvenliği kültürüne uzun vadeli taahhüt','Dahili denetim standardı'],c:2}
+]},
+RU:{questions:[
+{q:'Что регулирует §42 IfSG?',opts:['Право на отпуск','Запрет деятельности при инфекционных заболеваниях','Частота уборки','Рабочее время'],c:1},
+{q:'Что нужно делать при симптомах инфекционного заболевания?',opts:['Ждать конца смены','Продолжать работу при отсутствии температуры','Немедленно сообщить руководителю и обратиться к врачу','Сообщать только при диарее более 3 дней'],c:2},
+{q:'Какие пластыри должны использоваться в производстве?',opts:['Белые стандартные','Прозрачные','Синие металлодетектируемые','Телесного цвета'],c:2},
+{q:'Что НЕ относится к шкафчику чёрной зоны?',opts:['Личная одежда','Мобильный телефон','Еда','Рабочий халат'],c:3},
+{q:'В каком порядке надевается сетка для волос?',opts:['Сначала халат потом сетку','Сначала сетку потом халат','Порядок не важен','Актуально только при входе'],c:1},
+{q:'Что такое конфискованные отходы?',opts:['Повторно используемое мясо','Приправленный фарш','Фарш и котлеты для утилизации','Сырое немолотое мясо'],c:2},
+{q:'Почему смартфоны запрещены в производстве?',opts:['Защита данных','Риск заражения посторонними предметами','Электромагнитные помехи','Они не запрещены'],c:1},
+{q:'Дезинфицирующие средства действуют только на...',opts:['влажных поверхностях','очищенных и сухих поверхностях','загрязнённых поверхностях','металлических поверхностях'],c:1},
+{q:'Сколько обязательных аллергенов для маркировки?',opts:['7','10','14','20'],c:2},
+{q:'Что означает Food Safety Always?',opts:['Единовременная инициатива','Процедура сертификации','Долгосрочное обязательство по культуре безопасности','Внутренний стандарт аудита'],c:2}
+]}
+};
+
+let lang='DE', curSlide=0, answered=false, quizAnswers=[], quizScore=0, starRating=0;
+
+function initTraining(l){
+  lang=l;
+  document.getElementById('lang-screen').style.display='none';
+  document.getElementById('player').style.display='flex';
+  applyUI();
+  renderSlide(0);
+}
+
+function applyUI(){
+  const u=UI[lang];
+  document.getElementById('prev-btn').textContent=u.prev;
+  document.getElementById('next-btn').textContent=u.next;
+  document.getElementById('replay-btn').textContent=u.replay;
+  document.getElementById('audio-lbl').textContent=u.rdy;
+}
+
+function renderSlide(idx){
+  curSlide=idx; answered=false;
+  const s=SLIDES[idx]; const u=UI[lang];
+  document.getElementById('progress-bar').style.width=((idx+1)/SLIDES.length*100)+'%';
+  document.getElementById('slide-counter').textContent=(idx+1)+' '+u.of+' '+SLIDES.length;
+  document.getElementById('slide-title').textContent=s.title[lang];
+  document.getElementById('narration-text').textContent=s.narr[lang];
+  const imgW=document.getElementById('img-wrap');
+  const vidW=document.getElementById('vid-wrap');
+  const ic=document.getElementById('interactive-controls');
+  const fb=document.getElementById('feedback-box');
+  imgW.style.display='none'; vidW.style.display='none'; ic.style.display='none'; fb.style.display='none';
+  if(s.type==='video'){
+    vidW.style.display='block';
+    const v=document.getElementById('slide-vid');
+    v.src=BASE+s.vid; v.load();
+    ic.style.display='flex';
+    document.getElementById('btn-r').textContent=u.r;
+    document.getElementById('btn-r').disabled=false;
+    document.getElementById('btn-f').textContent=u.f;
+    document.getElementById('btn-f').disabled=false;
+    document.getElementById('next-btn').disabled=true;
+  } else {
+    imgW.style.display='block';
+    const img=document.getElementById('slide-img');
+    img.src=BASE+s.img; img.style.display='block';
+    document.getElementById('next-btn').disabled=false;
+  }
+  document.getElementById('prev-btn').disabled=idx===0;
+  document.getElementById('next-btn').textContent=idx===SLIDES.length-1?u.finish:u.next;
+  speakText(s.narr[lang]);
+}
+
+function speakText(txt){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const lc={DE:'de-DE',EN:'en-GB',TR:'tr-TR',RU:'ru-RU'};
+  const u2=new SpeechSynthesisUtterance(txt);
+  u2.lang=lc[lang]||'de-DE'; u2.rate=0.95;
+  const as=document.getElementById('audio-status');
+  const al=document.getElementById('audio-lbl');
+  u2.onstart=()=>{as.classList.add('playing');al.textContent=UI[lang].spk;};
+  u2.onend=()=>{as.classList.remove('playing');al.textContent=UI[lang].rdy;};
+  window.speechSynthesis.speak(u2);
+}
+
+function replayAudio(){speakText(SLIDES[curSlide].narr[lang]);}
+
+function nextSlide(){
+  window.speechSynthesis.cancel();
+  if(curSlide<SLIDES.length-1)renderSlide(curSlide+1);
+  else showQuiz();
+}
+function prevSlide(){
+  window.speechSynthesis.cancel();
+  if(curSlide>0)renderSlide(curSlide-1);
+}
+
+function submitAnswer(ans){
+  if(answered)return; answered=true;
+  document.getElementById('btn-r').disabled=true;
+  document.getElementById('btn-f').disabled=true;
+  const s=SLIDES[curSlide]; const correct=ans===s.correct;
+  const fb=document.getElementById('feedback-box');
+  fb.style.display='block';
+  fb.className=correct?'correct':'wrong';
+  fb.textContent=correct?s.fb.c[lang]:s.fb.w[lang];
+  document.getElementById('next-btn').disabled=false;
+}
+
+function showQuiz(){
+  document.getElementById('player').style.display='none';
+  const qs=document.getElementById('quiz-screen');
+  qs.style.display='flex'; qs.style.flexDirection='column'; qs.style.alignItems='center';
+  const u=UI[lang]; const qd=QUIZ[lang];
+  quizAnswers=new Array(qd.questions.length).fill(null);
+  let html=`<h2>${u.qtitle}</h2><p class="quiz-sub">${u.qsub}</p>`;
+  qd.questions.forEach((q,qi)=>{
+    html+=`<div class="quiz-card"><div class="quiz-qnum">${u.qtitle} · ${qi+1} ${u.of} ${qd.questions.length}</div><div class="quiz-qtext">${q.q}</div><div class="quiz-opts" id="opts-${qi}">`;
+    q.opts.forEach((opt,oi)=>{html+=`<button class="quiz-opt" onclick="selectOpt(${qi},${oi})">${opt}</button>`;});
+    html+=`</div></div>`;
+  });
+  html+=`<button id="quiz-submit" onclick="submitQuiz()">${u.qsubmit}</button>`;
+  qs.innerHTML=html;
+}
+
+function selectOpt(qi,oi){
+  quizAnswers[qi]=oi;
+  document.querySelectorAll(`#opts-${qi} .quiz-opt`).forEach((b,i)=>b.classList.toggle('selected',i===oi));
+}
+
+function submitQuiz(){
+  const qd=QUIZ[lang]; const u=UI[lang];
+  if(quizAnswers.some(a=>a===null)){
+    alert(lang==='DE'?'Bitte beantworten Sie alle Fragen.':lang==='EN'?'Please answer all questions.':lang==='TR'?'Lütfen tüm soruları cevaplayın.':'Пожалуйста, ответьте на все вопросы.');
+    return;
+  }
+  let correct=0;
+  quizAnswers.forEach((ans,qi)=>{
+    if(ans===qd.questions[qi].c)correct++;
+    document.querySelectorAll(`#opts-${qi} .quiz-opt`).forEach((b,oi)=>{
+      b.disabled=true;
+      if(oi===qd.questions[qi].c)b.classList.add('correct-reveal');
+      else if(oi===ans&&ans!==qd.questions[qi].c)b.classList.add('wrong-reveal');
+    });
+  });
+  quizScore=correct;
+  setTimeout(()=>showResult(correct,qd.questions.length),800);
+}
+
+function showResult(correct,total){
+  document.getElementById('quiz-screen').style.display='none';
+  const rs=document.getElementById('result-screen');
+  rs.style.display='flex'; rs.style.flexDirection='column';
+  const u=UI[lang]; const pct=Math.round(correct/total*100); const passed=correct/total>=0.8;
+  rs.innerHTML=`<div class="res-score">${pct}%</div>
+  <div class="res-label">${correct} ${u.rof} ${total} ${u.rcorr}</div>
+  <div class="res-verdict ${passed?'pass':'fail'}">${passed?u.passed:u.failed}</div>
+  ${!passed?`<button class="res-retry" onclick="retryQuiz()">${u.retry}</button>`:''}
+  ${passed?`<button class="res-cont" onclick="showRating()">${u.tocont}</button>`:''}`;
+}
+
+function retryQuiz(){document.getElementById('result-screen').style.display='none';showQuiz();}
+
+function showRating(){
+  document.getElementById('result-screen').style.display='none';
+  const rt=document.getElementById('rating-screen');
+  rt.style.display='flex'; rt.style.flexDirection='column'; rt.style.alignItems='center';
+  const u=UI[lang];
+  rt.innerHTML=`<h2>${u.rattitle}</h2><p class="rat-sub">${u.ratsub}</p>
+  <div class="rat-card">
+    <div class="rat-label">${u.ratq}</div>
+    <div class="stars" id="stars">
+      <span class="star" onclick="setStar(1)">★</span><span class="star" onclick="setStar(2)">★</span>
+      <span class="star" onclick="setStar(3)">★</span><span class="star" onclick="setStar(4)">★</span>
+      <span class="star" onclick="setStar(5)">★</span>
+    </div>
+    <div class="rat-label">${u.ratcomment}</div>
+    <textarea class="rat-comment" id="rat-comment" placeholder="${u.ratph}"></textarea>
+    <button class="rat-submit" onclick="submitRating()">${u.ratsubmit}</button>
+  </div>`;
+}
+
+function setStar(v){
+  starRating=v;
+  document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('active',i<v));
+}
+
+function submitRating(){
+  if(!starRating){alert(lang==='DE'?'Bitte geben Sie eine Bewertung ab.':lang==='EN'?'Please provide a rating.':lang==='TR'?'Lütfen değerlendirme yapın.':'Пожалуйста, дайте оценку.');return;}
+  document.getElementById('rating-screen').style.display='none';
+  showSignoff();
+}
+
+function showSignoff(){
+  const so=document.getElementById('signoff-screen');
+  so.style.display='flex'; so.style.flexDirection='column'; so.style.alignItems='center';
+  const u=UI[lang];
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('de-DE')+' '+now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  so.innerHTML=`<h2>${u.sotitle}</h2><p class="so-sub">${u.sosub}</p>
+  <div class="so-card">
+    <div class="field-grp"><label class="field-lbl">${u.lname}</label><input class="field-inp" id="f-name" type="text" placeholder="Vorname Nachname"></div>
+    <div class="field-grp"><label class="field-lbl">${u.lempid}</label><input class="field-inp" id="f-empid" type="text" placeholder="12345"></div>
+    <div class="field-grp"><label class="field-lbl">${u.ldept}</label><input class="field-inp" id="f-dept" type="text" placeholder="Produktion Linie 9"></div>
+    <div class="field-grp"><label class="field-lbl">${u.ldate}</label><input class="field-inp" id="f-date" type="text" value="${dateStr}" readonly></div>
+    <div class="confirm-row"><input type="checkbox" id="f-confirm" onchange="document.getElementById('so-btn').disabled=!this.checked"><label for="f-confirm">${u.confirm}</label></div>
+    <button class="so-submit" id="so-btn" onclick="submitSignoff()" disabled>${u.sosubmit}</button>
+  </div>`;
+}
+
+function submitSignoff(){
+  const name=document.getElementById('f-name').value.trim();
+  const empid=document.getElementById('f-empid').value.trim();
+  const dept=document.getElementById('f-dept').value.trim();
+  const date=document.getElementById('f-date').value;
+  const comment=document.getElementById('rat-comment')?document.getElementById('rat-comment').value:'';
+  if(!name||!empid){alert(lang==='DE'?'Bitte füllen Sie alle Pflichtfelder aus.':lang==='EN'?'Please complete all required fields.':lang==='TR'?'Lütfen tüm zorunlu alanları doldurun.':'Пожалуйста, заполните все обязательные поля.');return;}
+  const refNum='HYG-'+Date.now();
+  const params=new URLSearchParams();
+  params.append(FIELDS.name,name); params.append(FIELDS.empid,empid); params.append(FIELDS.dept,dept);
+  params.append(FIELDS.date,date); params.append(FIELDS.module,'Hygieneschulung 2026');
+  params.append(FIELDS.lang,lang); params.append(FIELDS.score,quizScore+'/10 ('+Math.round(quizScore/10*100)+'%)');
+  params.append(FIELDS.rating,starRating+'/5'); params.append(FIELDS.comment,comment);
+  fetch(FORM_URL,{method:'POST',mode:'no-cors',body:params}).catch(()=>{});
+  document.getElementById('signoff-screen').style.display='none';
+  showDone(refNum,name);
+}
+
+function showDone(ref,name){
+  const ds=document.getElementById('done-screen');
+  ds.style.display='flex'; ds.style.flexDirection='column';
+  const u=UI[lang];
+  ds.innerHTML=`<div class="done-icon">✅</div>
+  <div class="done-title">${u.donetitle}</div>
+  <div class="done-sub">${u.donesub}</div>
+  <div class="done-ref"><strong>${u.reflab}</strong><br>${ref}</div>`;
+}
+</script>
+</body>
+</html>
