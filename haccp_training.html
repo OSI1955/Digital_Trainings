@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSI Food Solutions – HACCP Schulung 2026</title>
+<style>
+:root{--blue:#0072CE;--red:#E4002B;--dark:#0a0a1a;--card:#0f3460;--surface:#16213e;--text:#e0e0e0;--muted:#a0a0b0;--success:#00c49a;--danger:#E4002B;--border:rgba(0,114,206,0.3);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--dark);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+#lang-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#0a0a1a,#0d1b3e);padding:40px;}
+.logo{color:var(--blue);font-size:2.2rem;font-weight:700;letter-spacing:2px;margin-bottom:8px;}
+.subtitle{color:var(--muted);font-size:1rem;margin-bottom:40px;}
+#lang-screen h2{font-size:1.3rem;color:var(--text);margin-bottom:24px;}
+.lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:500px;}
+.lang-btn{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:24px 16px;text-align:center;cursor:pointer;transition:all 0.2s;color:var(--text);font-size:1rem;font-weight:600;}
+.lang-btn:hover{border-color:var(--blue);background:#1a3a6e;transform:translateY(-2px);}
+.lang-btn .flag{font-size:2rem;display:block;margin-bottom:8px;}
+#player{display:none;flex-direction:column;height:100vh;}
+#topbar{background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;}
+#topbar .brand{color:var(--blue);font-weight:700;font-size:1rem;}
+#topbar .mod-name{color:var(--muted);font-size:0.85rem;}
+#slide-counter{color:var(--muted);font-size:0.85rem;}
+#progress-wrap{background:rgba(0,0,0,0.4);height:4px;flex-shrink:0;}
+#progress-bar{height:4px;background:linear-gradient(90deg,var(--blue),var(--red));transition:width 0.4s ease;width:0%;}
+#slide-display{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;background:linear-gradient(180deg,#0d1b3e,#0a0a1a);overflow-y:auto;}
+.slide-title{font-size:1.4rem;font-weight:700;color:var(--blue);text-align:center;margin-bottom:16px;line-height:1.3;}
+.slide-img-wrap{max-width:680px;width:100%;border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:16px;background:#000;}
+.slide-img-wrap img{width:100%;height:auto;display:block;max-height:320px;object-fit:contain;}
+#narration-box{background:rgba(0,114,206,0.08);border:1px solid var(--border);border-radius:12px;padding:16px 20px;max-width:680px;width:100%;font-size:0.93rem;line-height:1.7;color:var(--text);margin-top:8px;}
+#audio-status{display:flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(0,114,206,0.1);border-radius:20px;font-size:0.8rem;color:var(--muted);}
+#audio-status .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);}
+#audio-status.playing .dot{background:var(--success);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+#bottom-bar{background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);flex-shrink:0;}
+.nav-btn{background:var(--card);border:1px solid var(--border);color:var(--text);padding:10px 22px;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;transition:all 0.2s;min-width:100px;}
+.nav-btn:hover:not(:disabled){background:var(--blue);border-color:var(--blue);color:#fff;}
+.nav-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.nav-btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;}
+#replay-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;}
+#replay-btn:hover{border-color:var(--blue);color:var(--blue);}
+#quiz-screen{display:none;flex-direction:column;align-items:center;padding:28px 20px;background:linear-gradient(135deg,#0a0a1a,#0d1b3e);min-height:100vh;overflow-y:auto;}
+#quiz-screen h2{color:var(--blue);font-size:1.4rem;margin-bottom:6px;}
+.quiz-sub{color:var(--muted);font-size:0.9rem;margin-bottom:24px;}
+.quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;max-width:660px;width:100%;margin-bottom:18px;}
+.quiz-qnum{color:var(--muted);font-size:0.82rem;margin-bottom:6px;}
+.quiz-qtext{font-size:1rem;font-weight:600;color:var(--text);margin-bottom:16px;line-height:1.5;}
+.quiz-opts{display:flex;flex-direction:column;gap:10px;}
+.quiz-opt{background:var(--card);border:2px solid var(--border);border-radius:8px;padding:11px 14px;cursor:pointer;font-size:0.9rem;color:var(--text);transition:all 0.15s;text-align:left;}
+.quiz-opt:hover{border-color:var(--blue);background:#1a3a6e;}
+.quiz-opt.selected{border-color:var(--blue);background:rgba(0,114,206,0.2);}
+.quiz-opt.correct-reveal{border-color:var(--success);background:rgba(0,196,154,0.15);color:var(--success);}
+.quiz-opt.wrong-reveal{border-color:var(--danger);background:rgba(228,0,43,0.12);color:#ff6b6b;}
+#quiz-submit{background:var(--blue);color:#fff;border:none;border-radius:10px;padding:14px 40px;font-size:1rem;font-weight:700;cursor:pointer;max-width:660px;width:100%;margin-top:6px;}
+#result-screen{display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background:linear-gradient(135deg,#0a0a1a,#0d1b3e);min-height:100vh;text-align:center;}
+.res-score{font-size:4rem;font-weight:700;color:var(--blue);margin-bottom:6px;}
+.res-label{font-size:1.1rem;color:var(--muted);margin-bottom:14px;}
+.res-verdict{font-size:1.4rem;font-weight:700;padding:12px 28px;border-radius:10px;margin-bottom:24px;}
+.res-verdict.pass{background:rgba(0,196,154,0.15);color:var(--success);border:1px solid var(--success);}
+.res-verdict.fail{background:rgba(228,0,43,0.12);color:#ff6b6b;border:1px solid var(--danger);}
+.res-retry{background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px 24px;border-radius:8px;cursor:pointer;font-size:0.9rem;margin-bottom:10px;}
+.res-cont{background:var(--blue);color:#fff;border:none;border-radius:10px;padding:14px 36px;font-size:1rem;font-weight:700;cursor:pointer;}
+#rating-screen{display:none;flex-direction:column;align-items:center;padding:40px 20px;background:linear-gradient(135deg,#0a0a1a,#0d1b3e);min-height:100vh;overflow-y:auto;}
+#rating-screen h2{color:var(--blue);font-size:1.3rem;margin-bottom:6px;}
+.rat-sub{color:var(--muted);font-size:0.9rem;margin-bottom:24px;}
+.rat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;max-width:520px;width:100%;}
+.rat-label{font-size:0.95rem;color:var(--text);margin-bottom:10px;}
+.stars{display:flex;gap:12px;justify-content:center;margin-bottom:22px;}
+.star{font-size:2.4rem;cursor:pointer;transition:transform 0.15s;color:#555;}
+.star:hover,.star.active{color:#f0a500;transform:scale(1.2);}
+.rat-comment{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-size:0.9rem;resize:vertical;min-height:80px;margin-bottom:18px;}
+.rat-submit{background:var(--blue);color:#fff;border:none;border-radius:10px;padding:14px 36px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;}
+#signoff-screen{display:none;flex-direction:column;align-items:center;padding:40px 20px;background:linear-gradient(135deg,#0a0a1a,#0d1b3e);min-height:100vh;overflow-y:auto;}
+#signoff-screen h2{color:var(--blue);font-size:1.3rem;margin-bottom:6px;}
+.so-sub{color:var(--muted);font-size:0.9rem;margin-bottom:24px;text-align:center;}
+.so-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;max-width:520px;width:100%;}
+.field-grp{margin-bottom:14px;}
+.field-lbl{font-size:0.85rem;color:var(--muted);margin-bottom:5px;display:block;}
+.field-inp{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:11px;color:var(--text);font-size:0.93rem;}
+.field-inp:focus{outline:none;border-color:var(--blue);}
+.confirm-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:18px;}
+.confirm-row input{width:18px;height:18px;margin-top:2px;accent-color:var(--blue);flex-shrink:0;}
+.confirm-row label{font-size:0.86rem;color:var(--muted);line-height:1.5;}
+.so-submit{background:var(--blue);color:#fff;border:none;border-radius:10px;padding:14px 36px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;}
+.so-submit:disabled{opacity:0.4;cursor:not-allowed;}
+#done-screen{display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background:linear-gradient(135deg,#0a0a1a,#0d1b3e);min-height:100vh;text-align:center;}
+.done-icon{font-size:4rem;margin-bottom:14px;}
+.done-title{font-size:1.6rem;font-weight:700;color:var(--success);margin-bottom:10px;}
+.done-sub{color:var(--muted);font-size:0.93rem;max-width:420px;line-height:1.6;margin-bottom:24px;}
+.done-ref{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 22px;font-size:0.85rem;color:var(--muted);max-width:420px;}
+.done-ref strong{color:var(--text);}
+</style>
+</head>
+<body>
+<div id="lang-screen">
+  <div class="logo">OSI FOOD SOLUTIONS</div>
+  <div class="subtitle">Günzburg · Plant 2005</div>
+  <h2>Bitte wählen Sie Ihre Sprache / Please select your language</h2>
+  <div class="lang-grid">
+    <div class="lang-btn" onclick="initTraining('DE')"><span class="flag">🇩🇪</span>Deutsch</div>
+    <div class="lang-btn" onclick="initTraining('EN')"><span class="flag">🇬🇧</span>English</div>
+    <div class="lang-btn" onclick="initTraining('TR')"><span class="flag">🇹🇷</span>Türkçe</div>
+    <div class="lang-btn" onclick="initTraining('RU')"><span class="flag">🇷🇺</span>Русский</div>
+  </div>
+</div>
+<div id="player">
+  <div id="topbar">
+    <div><div class="brand">OSI FOOD SOLUTIONS</div><div class="mod-name">HACCP Schulung 2026</div></div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div id="audio-status"><div class="dot"></div><span id="audio-lbl">Bereit</span></div>
+      <div id="slide-counter">1 / 18</div>
+    </div>
+  </div>
+  <div id="progress-wrap"><div id="progress-bar"></div></div>
+  <div id="slide-display">
+    <div class="slide-title" id="slide-title">Lade...</div>
+    <div class="slide-img-wrap" id="img-wrap"><img id="slide-img" src="" alt=""></div>
+    <div id="narration-box"><div id="narration-text"></div></div>
+  </div>
+  <div id="bottom-bar">
+    <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled>← Zurück</button>
+    <button id="replay-btn" onclick="replayAudio()">🔊 Wiederholen</button>
+    <button class="nav-btn primary" id="next-btn" onclick="nextSlide()">Weiter →</button>
+  </div>
+</div>
+<div id="quiz-screen"></div>
+<div id="result-screen"></div>
+<div id="rating-screen"></div>
+<div id="signoff-screen"></div>
+<div id="done-screen"></div>
+<script>
+const BASE='https://raw.githubusercontent.com/OSI1955/Digital_Trainings/main/';
+const FORM_URL='https://docs.google.com/forms/d/e/REPLACE_FORM_ID/formResponse';
+const FIELDS={name:'entry.1',empid:'entry.2',dept:'entry.3',date:'entry.4',module:'entry.5',lang:'entry.6',score:'entry.7',rating:'entry.8',comment:'entry.9'};
+
+const UI={
+DE:{prev:'← Zurück',next:'Weiter →',finish:'Zum Quiz →',replay:'🔊 Wiederholen',rdy:'Bereit',spk:'Spricht...',of:'von',
+    qtitle:'Wissenstest',qsub:'Mindestens 80% richtig (8 von 10)',qsubmit:'Auswertung anzeigen',
+    rof:'von',rcorr:'Fragen richtig',passed:'✓ Bestanden',failed:'✗ Nicht bestanden',retry:'Quiz wiederholen',tocont:'Weiter →',
+    rattitle:'Schulungsbewertung',ratsub:'Ihre Rückmeldung hilft uns, die Qualität zu verbessern.',ratq:'Wie bewerten Sie diese Schulung?',ratcomment:'Anmerkungen (optional):',ratph:'Ihre Anmerkungen...',ratsubmit:'Weiter →',
+    sotitle:'Digitale Unterschrift',sosub:'Bitte füllen Sie alle Felder aus.',lname:'Vollständiger Name *',lempid:'Personalnummer *',ldept:'Abteilung / Linie *',ldate:'Datum',
+    confirm:'Ich bestätige, dass ich diese HACCP-Schulung vollständig absolviert habe und die Inhalte verstanden habe.',sosubmit:'Abschließen und absenden →',
+    donetitle:'Schulung abgeschlossen',donesub:'Ihr HACCP-Schulungsnachweis wurde gespeichert.',reflab:'Referenznummer:'},
+EN:{prev:'← Back',next:'Next →',finish:'To Quiz →',replay:'🔊 Replay',rdy:'Ready',spk:'Speaking...',of:'of',
+    qtitle:'Knowledge Test',qsub:'Minimum 80% correct (8 of 10)',qsubmit:'Show Results',
+    rof:'of',rcorr:'questions correct',passed:'✓ Passed',failed:'✗ Not Passed',retry:'Retry Quiz',tocont:'Continue →',
+    rattitle:'Training Rating',ratsub:'Your feedback helps us improve quality.',ratq:'How do you rate this training overall?',ratcomment:'Comments (optional):',ratph:'Your comments...',ratsubmit:'Continue →',
+    sotitle:'Digital Signature',sosub:'Please complete all fields.',lname:'Full Name *',lempid:'Employee Number *',ldept:'Department / Line *',ldate:'Date',
+    confirm:'I confirm that I have completed this HACCP training in full and understood its contents.',sosubmit:'Complete and Submit →',
+    donetitle:'Training Completed',donesub:'Your HACCP training record has been saved.',reflab:'Reference Number:'},
+TR:{prev:'← Geri',next:'İleri →',finish:'Teste Git →',replay:'🔊 Tekrarla',rdy:'Hazır',spk:'Konuşuyor...',of:'/',
+    qtitle:'Bilgi Testi',qsub:'En az %80 doğru (10 üzerinden 8)',qsubmit:'Sonuçları Göster',
+    rof:'/',rcorr:'soru doğru',passed:'✓ Geçti',failed:'✗ Geçemedi',retry:'Testi Tekrarla',tocont:'Devam →',
+    rattitle:'Eğitim Değerlendirmesi',ratsub:'Geri bildiriminiz kaliteyi artırmamıza yardımcı olur.',ratq:'Bu eğitimi nasıl değerlendiriyorsunuz?',ratcomment:'Yorumlar (isteğe bağlı):',ratph:'Yorumlarınız...',ratsubmit:'Devam →',
+    sotitle:'Dijital İmza',sosub:'Lütfen tüm alanları doldurun.',lname:'Tam Ad *',lempid:'Personel Numarası *',ldept:'Bölüm / Hat *',ldate:'Tarih',
+    confirm:'Bu HACCP eğitimini eksiksiz tamamladığımı ve içeriğini anladığımı onaylıyorum.',sosubmit:'Tamamla ve Gönder →',
+    donetitle:'Eğitim Tamamlandı',donesub:'HACCP eğitim kaydınız kaydedildi.',reflab:'Referans Numarası:'},
+RU:{prev:'← Назад',next:'Далее →',finish:'К тесту →',replay:'🔊 Повторить',rdy:'Готово',spk:'Озвучивание...',of:'из',
+    qtitle:'Тест знаний',qsub:'Минимум 80% правильных (8 из 10)',qsubmit:'Показать результаты',
+    rof:'из',rcorr:'вопросов правильно',passed:'✓ Пройдено',failed:'✗ Не пройдено',retry:'Повторить тест',tocont:'Продолжить →',
+    rattitle:'Оценка обучения',ratsub:'Ваши отзывы помогают нам улучшить качество.',ratq:'Как вы оцениваете это обучение?',ratcomment:'Комментарии (необязательно):',ratph:'Ваши комментарии...',ratsubmit:'Продолжить →',
+    sotitle:'Цифровая подпись',sosub:'Пожалуйста, заполните все поля.',lname:'Полное имя *',lempid:'Табельный номер *',ldept:'Отдел / Линия *',ldate:'Дата',
+    confirm:'Я подтверждаю, что прошёл(а) это обучение HACCP полностью и понял(а) его содержание.',sosubmit:'Завершить и отправить →',
+    donetitle:'Обучение завершено',donesub:'Ваша запись об обучении HACCP сохранена.',reflab:'Номер ссылки:'}
+};
+
+const SLIDES=[
+{id:1,img:'haccp_images/image5.png',title:{DE:'HACCP Schulung 2026',EN:'HACCP Training 2026',TR:'HACCP Eğitimi 2026',RU:'Обучение HACCP 2026'},
+narr:{DE:'Willkommen zur HACCP Schulung 2026 bei OSI Food Solutions. Diese Schulung erklärt Ihnen, warum das HACCP-System existiert, wie es in unserem Betrieb funktioniert, und was Ihre persönliche Verantwortung dabei ist.',
+EN:'Welcome to the HACCP Training 2026 at OSI Food Solutions. This training explains why the HACCP system exists, how it works in our facility, and what your personal responsibility is.',
+TR:'OSI Food Solutions HACCP Eğitimi 2026\'ya hoş geldiniz. Bu eğitim HACCP sisteminin neden var olduğunu, tesisimizde nasıl çalıştığını ve kişisel sorumluluğunuzun ne olduğunu açıklar.',
+RU:'Добро пожаловать на обучение HACCP 2026 в OSI Food Solutions. Это обучение объясняет, почему существует система HACCP, как она работает на нашем предприятии и какова ваша личная ответственность.'}},
+{id:2,img:'haccp_images/image7.png',title:{DE:'Lebensmittelsicherheit',EN:'Food Safety',TR:'Gıda Güvenliği',RU:'Безопасность пищевых продуктов'},
+narr:{DE:'Lebensmittelbetriebe sind gesetzlich verpflichtet, die Sicherheit ihrer Produkte nachweisen zu können. Das gilt für jede Stufe der Lebensmittelkette. Bei OSI bedeutet das: Wir müssen jederzeit belegen können, dass unsere Produkte sicher sind.',
+EN:'Food businesses are legally required to demonstrate the safety of their products at every stage of the food chain. At OSI this means we must be able to prove at any time that our products are safe.',
+TR:'Gıda işletmeleri, gıda zincirinin her aşamasında ürünlerinin güvenliğini kanıtlamakla yasal olarak yükümlüdür. OSI\'da bu, ürünlerimizin her zaman güvenli olduğunu kanıtlayabilmemiz gerektiği anlamına gelir.',
+RU:'Предприятия пищевой промышленности юридически обязаны доказывать безопасность своей продукции на каждом этапе пищевой цепочки. В OSI это означает, что мы должны в любое время подтверждать безопасность нашей продукции.'}},
+{id:3,img:'haccp_images/image9.jpeg',title:{DE:'Was ist HACCP?',EN:'What is HACCP?',TR:'HACCP Nedir?',RU:'Что такое HACCP?'},
+narr:{DE:'HACCP steht für Hazard Analysis and Critical Control Points – Gefahrenanalyse und kritische Lenkungspunkte. Es handelt sich um ein vorbeugendes System. Das Ziel ist nicht, Fehler nachher zu finden, sondern spezifische Gesundheitsrisiken für den Verbraucher von vornherein zu vermeiden.',
+EN:'HACCP stands for Hazard Analysis and Critical Control Points. It is a preventive system. The goal is not to find errors after they occur, but to prevent specific health risks to consumers from the outset.',
+TR:'HACCP, Tehlike Analizi ve Kritik Kontrol Noktaları anlamına gelir. Önleyici bir sistemdir. Amaç hataları sonradan bulmak değil, tüketiciler için spesifik sağlık risklerini baştan önlemektir.',
+RU:'HACCP расшифровывается как Анализ опасностей и критические контрольные точки. Это превентивная система. Цель — не обнаруживать ошибки после их возникновения, а предотвращать конкретные риски для здоровья потребителей с самого начала.'}},
+{id:4,img:'haccp_images/image8.jpeg',title:{DE:'HACCP-Studie',EN:'HACCP Study',TR:'HACCP Çalışması',RU:'Исследование HACCP'},
+narr:{DE:'Die Durchführung einer HACCP-Studie ist gesetzlich vorgeschrieben. In dieser Studie werden sämtliche Risiken entlang unseres gesamten Produktionsprozesses systematisch ermittelt, bewertet und kontrolliert. Das beginnt beim Wareneingang und endet bei der Lagerung des Endprodukts.',
+EN:'Conducting a HACCP study is a legal requirement. In this study, all risks along our entire production process are systematically identified, assessed and controlled. This begins at goods receipt and ends at finished product storage.',
+TR:'HACCP çalışması yapılması yasal bir gerekliliktir. Bu çalışmada üretim sürecimiz boyunca tüm riskler sistematik olarak belirlenir, değerlendirilir ve kontrol edilir.',
+RU:'Проведение исследования HACCP является законодательным требованием. В этом исследовании все риски вдоль всего производственного процесса систематически выявляются, оцениваются и контролируются.'}},
+{id:5,img:'haccp_images/image10.jpeg',title:{DE:'Ziel der HACCP-Studie',EN:'Goal of the HACCP Study',TR:'HACCP Çalışmasının Amacı',RU:'Цель исследования HACCP'},
+narr:{DE:'Das Ziel ist eindeutig: Beim Verzehr unserer Produkte darf kein Mensch krank werden. Wir erreichen dieses Ziel, indem wir unseren Herstellungsablauf systematisch überprüfen, kritische Lenkungspunkte identifizieren, und diese kontinuierlich überwachen.',
+EN:'The goal is clear: no person should become ill from consuming our products. We achieve this by systematically reviewing our production process, identifying critical control points, and continuously monitoring them.',
+TR:'Amaç açıktır: ürünlerimizi tüketen hiç kimse hasta olmamalıdır. Bunu üretim sürecimizi sistematik olarak gözden geçirerek, kritik kontrol noktalarını belirleyerek ve bunları sürekli izleyerek başarırız.',
+RU:'Цель ясна: ни один человек не должен заболеть от употребления нашей продукции. Мы достигаем этого, систематически проверяя производственный процесс, выявляя критические контрольные точки и непрерывно их отслеживая.'}},
+{id:6,img:'haccp_images/image3.png',title:{DE:'Die 7 HACCP-Grundsätze',EN:'The 7 HACCP Principles',TR:'7 HACCP İlkesi',RU:'7 принципов HACCP'},
+narr:{DE:'Das HACCP-System basiert auf sieben Grundsätzen. Erstens: Ermittlung von Gefahren. Zweitens: Bestimmung der kritischen Kontrollpunkte. Drittens: Festlegung von Grenzwerten. Viertens: Überwachung. Fünftens: Korrekturmaßnahmen. Sechstens: Verifikation. Siebtens: Dokumentation. Diese sieben Grundsätze bilden das Fundament unseres Systems.',
+EN:'The HACCP system is based on seven principles. First: hazard analysis. Second: identification of critical control points. Third: establishment of critical limits. Fourth: monitoring. Fifth: corrective actions. Sixth: verification. Seventh: documentation and record keeping. These seven principles form the foundation of our system.',
+TR:'HACCP sistemi yedi ilkeye dayanır: tehlike analizi, kritik kontrol noktalarının belirlenmesi, kritik limitlerin oluşturulması, izleme, düzeltici eylemler, doğrulama ve kayıt tutma.',
+RU:'Система HACCP основана на семи принципах: анализ опасностей, определение ККТ, установление критических пределов, мониторинг, корректирующие действия, верификация и документирование.'}},
+{id:7,img:'haccp_images/image11.jpeg',title:{DE:'Ermittlung von Gefahren',EN:'Hazard Identification',TR:'Tehlike Tespiti',RU:'Выявление опасностей'},
+narr:{DE:'Wir unterscheiden drei Kategorien. Biologische Gefahren: Bakterien wie Salmonellen, Viren und Schädlinge. Physikalische Gefahren: Fremdkörper wie Metall, Holz, Nägel, Glas, Kunststoff, Knochen. Chemische Gefahren: Reinigungsmittelrückstände, Hemmstoffe, Maschinenöl. Alle drei Kategorien müssen aktiv kontrolliert werden.',
+EN:'We distinguish three categories. Biological hazards: bacteria such as Salmonella, viruses and pests. Physical hazards: foreign objects such as metal, wood, nails, glass, plastic, bone. Chemical hazards: cleaning agent residues, inhibitors, machine oil. All three categories must be actively controlled.',
+TR:'Üç kategori ayırt ederiz. Biyolojik tehlikeler: Salmonella gibi bakteriler, virüsler ve zararlılar. Fiziksel tehlikeler: metal, tahta, çivi, cam, plastik, kemik gibi yabancı cisimler. Kimyasal tehlikeler: temizlik maddesi kalıntıları, inhibitörler, makine yağı.',
+RU:'Мы различаем три категории. Биологические опасности: бактерии, такие как сальмонелла, вирусы и вредители. Физические опасности: посторонние предметы — металл, дерево, гвозди, стекло, пластик, кость. Химические опасности: остатки моющих средств, ингибиторы, машинное масло.'}},
+{id:8,img:'haccp_images/image12.png',title:{DE:'Kritische Kontrollpunkte – Metallerkennung',EN:'Critical Control Points – Metal Detection',TR:'Kritik Kontrol Noktaları – Metal Tespiti',RU:'Критические контрольные точки – металлодетекция'},
+narr:{DE:'In unserem Betrieb ist der kritische Kontrollpunkt für physikalische Gefahren die Metallerkennung. Metallkontaminationen können durch vier Systeme erkannt werden: das X-Ray-System, der Bulk-Flow-Detektor, das fahrbare Metallsuchgerät, und der Metallcheck am Formax.',
+EN:'In our facility, the critical control point for physical hazards is metal detection. Metal contaminations can be detected by four systems: the X-Ray system, the Bulk-Flow detector, the mobile metal detector, and the metal check at the Formax.',
+TR:'Tesisimizde fiziksel tehlikeler için kritik kontrol noktası metal tespittir. Metal kontaminasyonlar dört sistem tarafından tespit edilebilir: X-Ray sistemi, Bulk-Flow dedektörü, taşınabilir metal dedektörü ve Formax\'taki metal kontrolü.',
+RU:'На нашем предприятии критической контрольной точкой для физических опасностей является металлодетекция. Металлические загрязнения обнаруживаются четырьмя системами: рентгеновской системой, детектором Bulk-Flow, мобильным металлодетектором и металлодетектором Formax.'}},
+{id:9,img:'haccp_images/image13.png',title:{DE:'Grenzwerte',EN:'Critical Limits',TR:'Kritik Limitler',RU:'Критические пределы'},
+narr:{DE:'Folgende Mindestmetallgrößen müssen erkannt werden. Am X-Ray und Bulk-Flow: Eisen ab 1,5 Millimeter. Am Metallsuchgerät am Formax und am fahrbaren Gerät: Eisen ab 1,5 Millimeter, Edelstahl ab 2,0 Millimeter, Nicht-Eisen ab 1,5 Millimeter. Beim Überprüfen muss immer die richtige Reihe ausgeworfen werden.',
+EN:'The following minimum metal sizes must be detected. At X-Ray and Bulk-Flow: iron from 1.5 millimeters. At the metal detector at the Formax and the mobile device: iron from 1.5 mm, stainless steel from 2.0 mm, non-ferrous from 1.5 mm. The correct row must always be ejected during checking.',
+TR:'Asgari metal boyutları tespit edilmelidir. X-Ray ve Bulk-Flow\'da: 1,5 mm\'den itibaren demir. Formax ve taşınabilir cihazda: 1,5 mm demir, 2,0 mm paslanmaz çelik, 1,5 mm demir dışı metaller.',
+RU:'Должны обнаруживаться следующие минимальные размеры металла. На X-Ray и Bulk-Flow: железо от 1,5 мм. На металлодетекторе Formax и мобильном устройстве: железо от 1,5 мм, нержавеющая сталь от 2,0 мм, цветные металлы от 1,5 мм.'}},
+{id:10,img:'haccp_images/image1.png',title:{DE:'Überwachung – Prüfhäufigkeit',EN:'Monitoring – Check Frequency',TR:'İzleme – Kontrol Sıklığı',RU:'Мониторинг – частота проверок'},
+narr:{DE:'Die Überwachung des X-Ray und Formax-Metallsuchgeräts erfolgt: vor und bei Produktionsbeginn, zu Beginn eines neuen Artikels, bei Produktionsende, und mindestens einmal pro Stunde. Ausnahme: Bulkflow und das fahrbare Metallsuchgerät werden nur einmal pro Schicht zu Beginn überprüft.',
+EN:'Monitoring of the X-Ray and Formax metal detector occurs: before and at production start, at the start of a new article, at production end, and at least once per hour. Exception: Bulk-Flow and the mobile metal detector are checked only once per shift at the beginning.',
+TR:'X-Ray ve Formax metal dedektörünün izlenmesi: üretim başlangıcından önce ve başında, yeni bir ürün başlangıcında, üretim sonunda ve saatte en az bir kez. İstisna: Bulk-Flow ve taşınabilir dedektör yalnızca vardiya başında bir kez kontrol edilir.',
+RU:'Мониторинг X-Ray и металлодетектора Formax осуществляется: до и при запуске производства, при начале нового артикула, при окончании производства и не менее одного раза в час. Исключение: Bulk-Flow и мобильный металлодетектор проверяются только раз за смену в начале.'}},
+{id:11,img:'haccp_images/image2.png',title:{DE:'Überwachung – korrekte Durchführung',EN:'Monitoring – Correct Execution',TR:'İzleme – Doğru Uygulama',RU:'Мониторинг – правильное выполнение'},
+narr:{DE:'Zwei wichtige Hinweise: Am X-Ray und NCL-System muss der Prüfkörper regelmäßig auf eine andere Spur gewechselt werden. Am Formax-Metallsuchgerät muss der Prüfkörper immer auf Patties in der mittleren Reihe aufgelegt werden. Diese Vorgaben sind nicht optional.',
+EN:'Two important notes: At the X-Ray and NCL system, the test body must be regularly changed to a different lane. At the Formax metal detector, the test body must always be placed on patties in the middle row. These requirements are not optional.',
+TR:'İki önemli not: X-Ray ve NCL sisteminde test cismi düzenli olarak farklı bir şeride değiştirilmelidir. Formax metal dedektöründe test cismi her zaman orta sıradaki köftelere yerleştirilmelidir.',
+RU:'Два важных замечания: на системе X-Ray и NCL тест-тело должно регулярно переноситься на другую дорожку. На металлодетекторе Formax тест-тело всегда должно помещаться на котлеты в средний ряд.'}},
+{id:12,img:'haccp_images/image14.png',title:{DE:'Dummycheck X-Ray',EN:'Dummy Check X-Ray',TR:'X-Ray Kukla Kontrolü',RU:'Контрольная проверка X-Ray'},
+narr:{DE:'Nach jeder Überprüfung ist nachzukontrollieren, dass der Prüfkörper aufgrund von CONTAM ausgeschleust wurde. Dazu öffnen Sie am X-Ray unter MENU die Bildablage und wählen das überprüfte Patty aus. Vor jeder Benutzung der Prüfkarte ist diese auf Unversehrtheit zu prüfen – die Metallkugel muss vorhanden sein.',
+EN:'After each check, verify that the test body was ejected due to CONTAM. To do this, open the image archive under MENU on the X-Ray and select the checked patty. Before each use of the test card, check its integrity – the metal ball must be present.',
+TR:'Her kontrolden sonra test cisminin CONTAM nedeniyle çıkarıldığını doğrulayın. Bunun için X-Ray\'de MENU altında Bildablage\'yi açın ve kontrol edilen köfteyi seçin. Her kullanımdan önce test kartının bütünlüğünü kontrol edin.',
+RU:'После каждой проверки убедитесь, что тест-тело было выброшено по причине CONTAM. Для этого откройте архив изображений под MENU на X-Ray и выберите проверенную котлету. Перед каждым использованием тест-карты проверьте её целостность.'}},
+{id:13,img:'haccp_images/image16.png',title:{DE:'Prüfkörper-Kontrolle',EN:'Test Body Check',TR:'Test Cismi Kontrolü',RU:'Проверка тест-тела'},
+narr:{DE:'Kontrollieren Sie bei den Prüfkörpern immer die Bohrung auf Vollständigkeit. Bei den Prüfkarten kontrollieren Sie die Kästchen auf CONTAM-Markierung. Nur ein einwandfreies Prüfmittel liefert ein aussagekräftiges Ergebnis. Ein fehlerhaftes Prüfmittel muss sofort gemeldet werden.',
+EN:'Always check the drill hole of test bodies for completeness. For test cards, check the boxes for CONTAM marking. Only a flawless test instrument produces a meaningful result. A defective test instrument must be reported immediately.',
+TR:'Test cisimlerinde her zaman deliğin eksiksizliğini kontrol edin. Test kartlarında CONTAM işaretini kontrol edin. Yalnızca kusursuz bir test aleti anlamlı sonuç verir. Hatalı test aleti derhal bildirilmelidir.',
+RU:'Всегда проверяйте отверстие тест-тел на полноту. На тест-картах проверяйте ячейки на наличие метки CONTAM. Только безупречный испытательный инструмент даёт значимый результат. О неисправном инструменте необходимо немедленно сообщить.'}},
+{id:14,img:'haccp_images/image17.jpeg',title:{DE:'Korrekturmaßnahmen',EN:'Corrective Actions',TR:'Düzeltici Eylemler',RU:'Корректирующие действия'},
+narr:{DE:'Wenn eine Ausschleusung nicht funktioniert: Linie sofort anhalten. QK-Schichtführer und Technik sofort informieren. Das Produkt sperren: von der letzten erfolgreichen Kontrolle bis zum Zeitpunkt, an dem das System wieder funktioniert. Diese Sperrung gilt für X-Ray, Bulk-Flow und das Metallsuchgerät.',
+EN:'If ejection does not work: stop the line immediately. Immediately inform the QC shift leader and engineering. Hold the product: from the last successful check until the system functions correctly again. This hold applies to X-Ray, Bulk-Flow and the metal detector.',
+TR:'Çıkarma çalışmazsa: hattı derhal durdurun. KK vardiya amirini ve teknik ekibi derhal bilgilendirin. Ürünü tutun: son başarılı kontrolden sistem tekrar çalışana kadar.',
+RU:'Если выброс не работает: немедленно остановите линию. Немедленно уведомите начальника смены КК и технический отдел. Заблокируйте продукт: с момента последней успешной проверки до восстановления работы системы.'}},
+{id:15,img:'haccp_images/image18.jpeg',title:{DE:'Verifizierungsverfahren',EN:'Verification Procedures',TR:'Doğrulama Prosedürleri',RU:'Процедуры верификации'},
+narr:{DE:'Zur regelmäßigen Verifikation führt die Qualitätskontrolle wöchentliche Belastbarkeitstests an allen Metalldetektoren und X-Ray-Geräten durch. Zusätzlich finden Wartungen durch interne und externe Techniker statt – mindestens einmal pro Jahr. Diese Aktivitäten werden dokumentiert.',
+EN:'For regular verification, quality control conducts weekly challenge tests on all metal detectors and X-Ray devices. In addition, maintenance by internal and external technicians takes place at least once per year. These activities are documented.',
+TR:'Düzenli doğrulama için kalite kontrol, tüm metal dedektörler ve X-Ray cihazlarında haftalık meydan okuma testleri yapar. Ayrıca iç ve dış teknisyenler tarafından yılda en az bir kez bakım yapılır.',
+RU:'Для регулярной верификации контроль качества проводит еженедельные испытания всех металлодетекторов и рентгеновских устройств. Кроме того, техническое обслуживание внутренними и внешними специалистами проводится не реже одного раза в год.'}},
+{id:16,img:'haccp_images/image19.jpeg',title:{DE:'Dokumentation – Uhrzeiten',EN:'Documentation – Times',TR:'Dokümantasyon – Saatler',RU:'Документация – время'},
+narr:{DE:'Korrekte Dokumentation ist ein gesetzliches Erfordernis. Tragen Sie immer die genaue Uhrzeit ein, wann Sie mit dem Kontrollrundgang beginnen. Nicht die runde Stunde, nicht fünfzehn Minuten später – die tatsächliche Uhrzeit. Zum Beispiel 12:09 Uhr, nicht 12:00 oder 12:15 Uhr.',
+EN:'Correct documentation is a legal requirement. Always enter the exact time when you begin the inspection round. Not the round hour, not fifteen minutes later – the actual time. For example 12:09, not 12:00 or 12:15.',
+TR:'Doğru dokümantasyon yasal bir gerekliliktir. Her zaman kontrol turuna başladığınız tam saati girin. Tam saat değil, on beş dakika sonra değil – gerçek saat. Örneğin 12:09, 12:00 veya 12:15 değil.',
+RU:'Правильная документация является законодательным требованием. Всегда указывайте точное время начала контрольного обхода. Не круглый час, не через пятнадцать минут — фактическое время. Например 12:09, а не 12:00 или 12:15.'}},
+{id:17,img:'haccp_images/image20.jpeg',title:{DE:'Dokumentation – Abweichungsliste',EN:'Documentation – Deviation List',TR:'Dokümantasyon – Sapma Listesi',RU:'Документация – список отклонений'},
+narr:{DE:'Für die HACCP-Abweichungsliste: Kalenderwochen dürfen nicht durcheinandergeschrieben werden. Uhrzeiten der letzten und aktuellen Kontrolle dürfen nicht vertauscht werden. Nach einer erfolgreichen Wiederholung müssen drei Personen unterschreiben: QK Produktion, Technik, und der QK-Schichtführer.',
+EN:'For the HACCP deviation list: calendar weeks must not be mixed up. Times of the last and current check must not be swapped. After a successful repeat check, three persons must sign: QC Production, Engineering, and the QC shift leader.',
+TR:'HACCP sapma listesi için: takvim haftaları karıştırılmamalıdır. Son ve mevcut kontrol saatleri değiştirilmemelidir. Başarılı bir tekrar kontrolden sonra üç kişi imzalamalıdır: KK Üretim, Teknik ve KK vardiya amiri.',
+RU:'Для списка отклонений HACCP: календарные недели нельзя путать. Время последней и текущей проверки нельзя менять местами. После успешной повторной проверки должны подписать три человека: КК производства, технический отдел и начальник смены КК.'}},
+{id:18,img:'haccp_images/image4.png',title:{DE:'Schlösser – Sicherheitsregel',EN:'Locks – Safety Rule',TR:'Kilitler – Güvenlik Kuralı',RU:'Замки – правило безопасности'},
+narr:{DE:'Die Schlösser an den CCP-Geräten müssen während der Produktion immer geschlossen sein. Sie dürfen nur von geschulten Personen geöffnet werden, und ausschließlich während der vorgeschriebenen Kontrollrunden. Unbefugtes Öffnen ist nicht erlaubt. Mit diesem Hinweis endet die HACCP-Schulung 2026. Bitte fahren Sie jetzt mit dem Wissenstest fort.',
+EN:'The locks on CCP devices must always be closed during production. They may only be opened by trained personnel, and only during the prescribed inspection rounds. Unauthorized opening is not permitted. This concludes the HACCP Training 2026. Please proceed to the knowledge test now.',
+TR:'ÜretimSırasında CCP cihazlarındaki kilitler her zaman kapalı olmalıdır. Yalnızca eğitimli personel tarafından ve yalnızca öngörülen kontrol turları sırasında açılabilirler. İzinsiz açma yasaktır. HACCP Eğitimi 2026 burada sona eriyor. Lütfen bilgi testine geçin.',
+RU:'Замки на устройствах ККТ должны быть всегда закрыты во время производства. Их могут открывать только обученные сотрудники и только во время предписанных контрольных обходов. Несанкционированное открытие не допускается. Обучение HACCP 2026 завершено. Пожалуйста, перейдите к тесту знаний.'}
+}];
+
+const QUIZ={
+DE:{questions:[
+{q:'Was bedeutet die Abkürzung HACCP?',opts:['Hazard Analysis and Critical Control Points','High Accuracy Control and Check Process','Hygienic Audit Control and Compliance Program','Hazardous Agent Control and Cleaning Protocol'],c:0},
+{q:'Welches System ist der CCP für physikalische Gefahren in unserem Betrieb?',opts:['Temperaturkontrolle','Metallerkennung (X-Ray, Bulkflow, Metallsuchgerät)','Mikrobiologische Testung','Verpackungskontrolle'],c:1},
+{q:'Wie groß muss ein Eisenpartikel mindestens sein, damit er am X-Ray erkannt wird?',opts:['0,5 mm','1,0 mm','1,5 mm','2,0 mm'],c:2},
+{q:'Wie oft muss das X-Ray-System mindestens mit dem Prüfkörper kontrolliert werden?',opts:['Einmal pro Tag','Einmal pro Schicht','Mindestens einmal pro Stunde','Alle zwei Stunden'],c:2},
+{q:'Was müssen Sie tun, wenn das X-Ray-System den Prüfkörper nicht ausschleust?',opts:['Weiterproduzieren und beim nächsten Check erneut versuchen','Linie stoppen, QK-Schichtführer und Technik informieren, Produkt sperren','Nur den QK-Schichtführer informieren','Das System neu starten und weiterproduzieren'],c:1},
+{q:'Wo muss der Prüfkörper am Formax-Metallsuchgerät aufgelegt werden?',opts:['Auf der ersten Reihe','Auf der letzten Reihe','Auf der mittleren Reihe','Es ist gleichgültig, auf welcher Reihe'],c:2},
+{q:'Wie oft wird der Bulkflow-Detektor mit dem Prüfkörper kontrolliert?',opts:['Stündlich','Täglich','Einmal pro Schicht zu Beginn','Wöchentlich'],c:2},
+{q:'Was ist beim Eintrag von Uhrzeiten in die Dokumentation zu beachten?',opts:['Die runde Stunde ist ausreichend','Die tatsächliche Uhrzeit muss eingetragen werden','Es reicht aus, den Zeitraum anzugeben','Eine Schätzung ist akzeptabel'],c:1},
+{q:'Wie viele Personen müssen nach einer erfolgreichen Wiederholungskontrolle auf der Abweichungsliste unterschreiben?',opts:['1','2','3','4'],c:2},
+{q:'Was sind die drei Kategorien von Gefahren im HACCP-System?',opts:['Biologische, chemische und physikalische Gefahren','Mikrobielle, allergene und physikalische Gefahren','Bakterielle, virale und chemische Gefahren','Biologische, radiologische und toxische Gefahren'],c:0}
+]},
+EN:{questions:[
+{q:'What does the abbreviation HACCP stand for?',opts:['Hazard Analysis and Critical Control Points','High Accuracy Control and Check Process','Hygienic Audit Control and Compliance Program','Hazardous Agent Control and Cleaning Protocol'],c:0},
+{q:'Which system is the CCP for physical hazards in our facility?',opts:['Temperature control','Metal detection (X-Ray, Bulk-Flow, metal detector)','Microbiological testing','Packaging control'],c:1},
+{q:'What is the minimum size of an iron particle that must be detected by the X-Ray?',opts:['0.5 mm','1.0 mm','1.5 mm','2.0 mm'],c:2},
+{q:'How often must the X-Ray system be checked with the test body at minimum?',opts:['Once per day','Once per shift','At least once per hour','Every two hours'],c:2},
+{q:'What must you do if the X-Ray system does not eject the test body?',opts:['Continue production and retry at the next check','Stop line, inform QC shift leader and engineering, hold product','Only inform the QC shift leader','Restart the system and continue production'],c:1},
+{q:'Where must the test body be placed at the Formax metal detector?',opts:['On the first row','On the last row','On the middle row','It does not matter which row'],c:2},
+{q:'How often is the Bulk-Flow detector checked with the test body?',opts:['Hourly','Daily','Once per shift at the beginning','Weekly'],c:2},
+{q:'What must be observed when entering times into documentation?',opts:['The round hour is sufficient','The actual time must be entered','Giving the time period is sufficient','An estimate is acceptable'],c:1},
+{q:'How many persons must sign the deviation list after a successful repeat check?',opts:['1','2','3','4'],c:2},
+{q:'What are the three categories of hazards in the HACCP system?',opts:['Biological, chemical and physical hazards','Microbial, allergenic and physical hazards','Bacterial, viral and chemical hazards','Biological, radiological and toxic hazards'],c:0}
+]},
+TR:{questions:[
+{q:'HACCP kısaltması ne anlama gelir?',opts:['Tehlike Analizi ve Kritik Kontrol Noktaları','Yüksek Doğruluk Kontrol ve Kontrol Süreci','Hijyenik Denetim Kontrol ve Uyum Programı','Tehlikeli Ajan Kontrolü ve Temizleme Protokolü'],c:0},
+{q:'Tesisimizde fiziksel tehlikeler için ÜKN hangi sistemdir?',opts:['Sıcaklık kontrolü','Metal tespiti (X-Ray, Bulk-Flow, metal dedektörü)','Mikrobiyolojik test','Ambalaj kontrolü'],c:1},
+{q:'X-Ray tarafından tespit edilmesi gereken minimum demir parçacığı boyutu nedir?',opts:['0,5 mm','1,0 mm','1,5 mm','2,0 mm'],c:2},
+{q:'X-Ray sistemi test cismiyle en az ne sıklıkla kontrol edilmelidir?',opts:['Günde bir kez','Vardiyada bir kez','En az saatte bir kez','Her iki saatte bir'],c:2},
+{q:'X-Ray sistemi test cismini çıkarmazsa ne yapmalısınız?',opts:['Üretimedevam edin ve bir sonraki kontrolde tekrar deneyin','Hattı durdurun, KK vardiya amirini ve teknik ekibi bilgilendirin, ürünü tutun','Yalnızca KK vardiya amirini bilgilendirin','Sistemi yeniden başlatın ve üretime devam edin'],c:1},
+{q:'Formax metal dedektöründe test cismi nereye yerleştirilmelidir?',opts:['Birinci sıraya','Son sıraya','Orta sıraya','Hangi sıraya konulduğu önemli değil'],c:2},
+{q:'Bulk-Flow dedektörü test cismiyle ne sıklıkla kontrol edilir?',opts:['Saatlik','Günlük','Vardiya başında bir kez','Haftalık'],c:2},
+{q:'Dokümantasyona saat girerken neye dikkat edilmelidir?',opts:['Tam saat yeterlidir','Gerçek saat girilmelidir','Zaman aralığı vermek yeterlidir','Tahmin kabul edilebilir'],c:1},
+{q:'Başarılı bir tekrar kontrolden sonra sapma listesini kaç kişi imzalamalıdır?',opts:['1','2','3','4'],c:2},
+{q:'HACCP sistemindeki üç tehlike kategorisi nelerdir?',opts:['Biyolojik, kimyasal ve fiziksel tehlikeler','Mikrobiyal, alerjenik ve fiziksel tehlikeler','Bakteriyel, viral ve kimyasal tehlikeler','Biyolojik, radyolojik ve toksik tehlikeler'],c:0}
+]},
+RU:{questions:[
+{q:'Что означает аббревиатура HACCP?',opts:['Анализ опасностей и критические контрольные точки','Процесс высокоточного контроля','Программа гигиенического аудита','Протокол контроля опасных агентов'],c:0},
+{q:'Какая система является ККТ для физических опасностей на нашем предприятии?',opts:['Контроль температуры','Металлодетекция (X-Ray, Bulk-Flow, металлодетектор)','Микробиологическое тестирование','Контроль упаковки'],c:1},
+{q:'Какой минимальный размер частицы железа должен обнаруживаться рентгеновским аппаратом?',opts:['0,5 мм','1,0 мм','1,5 мм','2,0 мм'],c:2},
+{q:'Как часто система X-Ray должна проверяться тест-телом как минимум?',opts:['Один раз в день','Один раз за смену','Не менее одного раза в час','Каждые два часа'],c:2},
+{q:'Что нужно делать если система X-Ray не выбрасывает тест-тело?',opts:['Продолжать производство и повторить при следующей проверке','Остановить линию, уведомить начальника смены КК и технический отдел, заблокировать продукт','Уведомить только начальника смены КК','Перезапустить систему и продолжить производство'],c:1},
+{q:'Куда следует помещать тест-тело на металлодетекторе Formax?',opts:['На первый ряд','На последний ряд','На средний ряд','Не важно в какой ряд'],c:2},
+{q:'Как часто детектор Bulk-Flow проверяется тест-телом?',opts:['Ежечасно','Ежедневно','Один раз за смену в начале','Еженедельно'],c:2},
+{q:'Что нужно соблюдать при внесении времени в документацию?',opts:['Достаточно указать круглый час','Необходимо указывать фактическое время','Достаточно указать временной промежуток','Оценка допустима'],c:1},
+{q:'Сколько человек должны подписать список отклонений после успешной повторной проверки?',opts:['1','2','3','4'],c:2},
+{q:'Каковы три категории опасностей в системе HACCP?',opts:['Биологические, химические и физические опасности','Микробные, аллергенные и физические опасности','Бактериальные, вирусные и химические опасности','Биологические, радиологические и токсические опасности'],c:0}
+]}
+};
+
+let lang='DE',curSlide=0,quizAnswers=[],quizScore=0,starRating=0;
+
+function initTraining(l){
+  lang=l;
+  document.getElementById('lang-screen').style.display='none';
+  document.getElementById('player').style.display='flex';
+  applyUI(); renderSlide(0);
+}
+
+function applyUI(){
+  const u=UI[lang];
+  document.getElementById('prev-btn').textContent=u.prev;
+  document.getElementById('next-btn').textContent=u.next;
+  document.getElementById('replay-btn').textContent=u.replay;
+  document.getElementById('audio-lbl').textContent=u.rdy;
+}
+
+function renderSlide(idx){
+  curSlide=idx;
+  const s=SLIDES[idx]; const u=UI[lang];
+  document.getElementById('progress-bar').style.width=((idx+1)/SLIDES.length*100)+'%';
+  document.getElementById('slide-counter').textContent=(idx+1)+' '+u.of+' '+SLIDES.length;
+  document.getElementById('slide-title').textContent=s.title[lang];
+  document.getElementById('narration-text').textContent=s.narr[lang];
+  const img=document.getElementById('slide-img');
+  img.src=BASE+s.img; img.style.display='block';
+  document.getElementById('prev-btn').disabled=idx===0;
+  document.getElementById('next-btn').disabled=false;
+  document.getElementById('next-btn').textContent=idx===SLIDES.length-1?u.finish:u.next;
+  speakText(s.narr[lang]);
+}
+
+function speakText(txt){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const lc={DE:'de-DE',EN:'en-GB',TR:'tr-TR',RU:'ru-RU'};
+  const u2=new SpeechSynthesisUtterance(txt);
+  u2.lang=lc[lang]||'de-DE'; u2.rate=0.95;
+  const as=document.getElementById('audio-status');
+  const al=document.getElementById('audio-lbl');
+  u2.onstart=()=>{as.classList.add('playing');al.textContent=UI[lang].spk;};
+  u2.onend=()=>{as.classList.remove('playing');al.textContent=UI[lang].rdy;};
+  window.speechSynthesis.speak(u2);
+}
+
+function replayAudio(){speakText(SLIDES[curSlide].narr[lang]);}
+
+function nextSlide(){
+  window.speechSynthesis.cancel();
+  if(curSlide<SLIDES.length-1)renderSlide(curSlide+1);
+  else showQuiz();
+}
+function prevSlide(){
+  window.speechSynthesis.cancel();
+  if(curSlide>0)renderSlide(curSlide-1);
+}
+
+function showQuiz(){
+  document.getElementById('player').style.display='none';
+  const qs=document.getElementById('quiz-screen');
+  qs.style.display='flex'; qs.style.flexDirection='column'; qs.style.alignItems='center';
+  const u=UI[lang]; const qd=QUIZ[lang];
+  quizAnswers=new Array(qd.questions.length).fill(null);
+  let html=`<h2>${u.qtitle}</h2><p class="quiz-sub">${u.qsub}</p>`;
+  qd.questions.forEach((q,qi)=>{
+    html+=`<div class="quiz-card"><div class="quiz-qnum">${u.qtitle} · ${qi+1} ${u.of} ${qd.questions.length}</div><div class="quiz-qtext">${q.q}</div><div class="quiz-opts" id="opts-${qi}">`;
+    q.opts.forEach((opt,oi)=>{html+=`<button class="quiz-opt" onclick="selectOpt(${qi},${oi})">${opt}</button>`;});
+    html+=`</div></div>`;
+  });
+  html+=`<button id="quiz-submit" onclick="submitQuiz()">${u.qsubmit}</button>`;
+  qs.innerHTML=html;
+}
+
+function selectOpt(qi,oi){
+  quizAnswers[qi]=oi;
+  document.querySelectorAll(`#opts-${qi} .quiz-opt`).forEach((b,i)=>b.classList.toggle('selected',i===oi));
+}
+
+function submitQuiz(){
+  const qd=QUIZ[lang]; const u=UI[lang];
+  if(quizAnswers.some(a=>a===null)){
+    alert(lang==='DE'?'Bitte beantworten Sie alle Fragen.':lang==='EN'?'Please answer all questions.':lang==='TR'?'Lütfen tüm soruları cevaplayın.':'Пожалуйста, ответьте на все вопросы.');
+    return;
+  }
+  let correct=0;
+  quizAnswers.forEach((ans,qi)=>{
+    if(ans===qd.questions[qi].c)correct++;
+    document.querySelectorAll(`#opts-${qi} .quiz-opt`).forEach((b,oi)=>{
+      b.disabled=true;
+      if(oi===qd.questions[qi].c)b.classList.add('correct-reveal');
+      else if(oi===ans&&ans!==qd.questions[qi].c)b.classList.add('wrong-reveal');
+    });
+  });
+  quizScore=correct;
+  setTimeout(()=>showResult(correct,qd.questions.length),800);
+}
+
+function showResult(correct,total){
+  document.getElementById('quiz-screen').style.display='none';
+  const rs=document.getElementById('result-screen');
+  rs.style.display='flex'; rs.style.flexDirection='column';
+  const u=UI[lang]; const pct=Math.round(correct/total*100); const passed=correct/total>=0.8;
+  rs.innerHTML=`<div class="res-score">${pct}%</div>
+  <div class="res-label">${correct} ${u.rof} ${total} ${u.rcorr}</div>
+  <div class="res-verdict ${passed?'pass':'fail'}">${passed?u.passed:u.failed}</div>
+  ${!passed?`<button class="res-retry" onclick="retryQuiz()">${u.retry}</button>`:''}
+  ${passed?`<button class="res-cont" onclick="showRating()">${u.tocont}</button>`:''}`;
+}
+
+function retryQuiz(){document.getElementById('result-screen').style.display='none';showQuiz();}
+
+function showRating(){
+  document.getElementById('result-screen').style.display='none';
+  const rt=document.getElementById('rating-screen');
+  rt.style.display='flex'; rt.style.flexDirection='column'; rt.style.alignItems='center';
+  const u=UI[lang];
+  rt.innerHTML=`<h2>${u.rattitle}</h2><p class="rat-sub">${u.ratsub}</p>
+  <div class="rat-card">
+    <div class="rat-label">${u.ratq}</div>
+    <div class="stars" id="stars">
+      <span class="star" onclick="setStar(1)">★</span><span class="star" onclick="setStar(2)">★</span>
+      <span class="star" onclick="setStar(3)">★</span><span class="star" onclick="setStar(4)">★</span>
+      <span class="star" onclick="setStar(5)">★</span>
+    </div>
+    <div class="rat-label">${u.ratcomment}</div>
+    <textarea class="rat-comment" id="rat-comment" placeholder="${u.ratph}"></textarea>
+    <button class="rat-submit" onclick="submitRating()">${u.ratsubmit}</button>
+  </div>`;
+}
+
+function setStar(v){
+  starRating=v;
+  document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('active',i<v));
+}
+
+function submitRating(){
+  if(!starRating){alert(lang==='DE'?'Bitte geben Sie eine Bewertung ab.':lang==='EN'?'Please provide a rating.':lang==='TR'?'Lütfen değerlendirme yapın.':'Пожалуйста, дайте оценку.');return;}
+  document.getElementById('rating-screen').style.display='none';
+  showSignoff();
+}
+
+function showSignoff(){
+  const so=document.getElementById('signoff-screen');
+  so.style.display='flex'; so.style.flexDirection='column'; so.style.alignItems='center';
+  const u=UI[lang];
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('de-DE')+' '+now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  so.innerHTML=`<h2>${u.sotitle}</h2><p class="so-sub">${u.sosub}</p>
+  <div class="so-card">
+    <div class="field-grp"><label class="field-lbl">${u.lname}</label><input class="field-inp" id="f-name" type="text" placeholder="Vorname Nachname"></div>
+    <div class="field-grp"><label class="field-lbl">${u.lempid}</label><input class="field-inp" id="f-empid" type="text" placeholder="12345"></div>
+    <div class="field-grp"><label class="field-lbl">${u.ldept}</label><input class="field-inp" id="f-dept" type="text" placeholder="Produktion Linie 7"></div>
+    <div class="field-grp"><label class="field-lbl">${u.ldate}</label><input class="field-inp" id="f-date" type="text" value="${dateStr}" readonly></div>
+    <div class="confirm-row"><input type="checkbox" id="f-confirm" onchange="document.getElementById('so-btn').disabled=!this.checked"><label for="f-confirm">${u.confirm}</label></div>
+    <button class="so-submit" id="so-btn" onclick="submitSignoff()" disabled>${u.sosubmit}</button>
+  </div>`;
+}
+
+function submitSignoff(){
+  const name=document.getElementById('f-name').value.trim();
+  const empid=document.getElementById('f-empid').value.trim();
+  const dept=document.getElementById('f-dept').value.trim();
+  const date=document.getElementById('f-date').value;
+  const comment=document.getElementById('rat-comment')?document.getElementById('rat-comment').value:'';
+  if(!name||!empid){alert(lang==='DE'?'Bitte füllen Sie alle Pflichtfelder aus.':lang==='EN'?'Please complete all required fields.':lang==='TR'?'Lütfen tüm zorunlu alanları doldurun.':'Пожалуйста, заполните все обязательные поля.');return;}
+  const refNum='HAC-'+Date.now();
+  const params=new URLSearchParams();
+  params.append(FIELDS.name,name); params.append(FIELDS.empid,empid); params.append(FIELDS.dept,dept);
+  params.append(FIELDS.date,date); params.append(FIELDS.module,'HACCP Schulung 2026');
+  params.append(FIELDS.lang,lang); params.append(FIELDS.score,quizScore+'/10 ('+Math.round(quizScore/10*100)+'%)');
+  params.append(FIELDS.rating,starRating+'/5'); params.append(FIELDS.comment,comment);
+  fetch(FORM_URL,{method:'POST',mode:'no-cors',body:params}).catch(()=>{});
+  document.getElementById('signoff-screen').style.display='none';
+  showDone(refNum);
+}
+
+function showDone(ref){
+  const ds=document.getElementById('done-screen');
+  ds.style.display='flex'; ds.style.flexDirection='column';
+  const u=UI[lang];
+  ds.innerHTML=`<div class="done-icon">✅</div>
+  <div class="done-title">${u.donetitle}</div>
+  <div class="done-sub">${u.donesub}</div>
+  <div class="done-ref"><strong>${u.reflab}</strong><br>${ref}</div>`;
+}
+</script>
+</body>
+</html>
